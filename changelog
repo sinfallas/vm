@@ -1,4 +1,10 @@
-commit fb86b3be49c0df3913a883ff1cd91b6f29024fe3 (HEAD, origin/master, origin/HEAD, master)
+commit 64b1d8f84b738851de273cd732662bdba7c647bd (HEAD, tag: v0.1, origin/master, origin/HEAD, master)
+Author: sinfallas <sinfallas@gmail.com>
+Date:   Sun Sep 7 15:07:05 2014 -0430
+
+    * changelog
+
+commit fb86b3be49c0df3913a883ff1cd91b6f29024fe3
 Author: sinfallas <sinfallas@gmail.com>
 Date:   Sun Sep 7 14:59:24 2014 -0430
 
