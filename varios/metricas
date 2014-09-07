@@ -1,0 +1,87 @@
+vm.dirty_bytes = 67108864
+vm.dirty_background_bytes = 134217728
+
+# ipv4 settings
+net.ipv4.tcp_rfc1337 = 1
+net.ipv4.tcp_congestion_control = htcp
+net.ipv4.tcp_fin_timeout = 15
+net.core.netdev_max_backlog = 2500
+net.ipv4.tcp_tw_recycle = 1
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_syn_retries = 1
+net.ipv4.tcp_synack_retries = 1
+net.ipv4.tcp_keepalive_time = 1800
+net.ipv4.tcp_keepalive_intvl = 30
+net.ipv4.tcp_window_scaling = 1
+net.ipv4.tcp_sack = 0
+net.ipv4.tcp_max_syn_backlog = 262144
+# number of packets to keep in backlog before the kernel starts dropping them
+net.ipv4.tcp_max_syn_backlog = 3240000
+# increase socket listen backlog
+net.core.somaxconn = 3240000
+net.ipv4.tcp_max_tw_buckets = 1440000
+net.ipv4.tcp_mtu_probing=1
+
+Y también es bueno habilitar netfilter (modprobe tcp_htcp, modprobe nf_conntrack
+nf_conntrack_ipv4)
+
+# netfilter settings
+net.netfilter.nf_conntrack_acct = 1
+net.netfilter.nf_conntrack_generic_timeout = 15
+net.netfilter.nf_conntrack_icmp_timeout = 5
+net.netfilter.nf_conntrack_tcp_timeout_close = 15
+net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
+net.netfilter.nf_conntrack_tcp_timeout_last_ack = 30
+net.netfilter.nf_conntrack_tcp_timeout_close_wait = 30
+net.netfilter.nf_conntrack_tcp_timeout_fin_wait = 30
+net.netfilter.nf_conntrack_tcp_timeout_established = 1800
+net.netfilter.nf_conntrack_tcp_timeout_syn_recv = 15
+net.netfilter.nf_conntrack_tcp_timeout_syn_sent = 15
+net.netfilter.nf_conntrack_udp_timeout = 10
+net.netfilter.nf_conntrack_udp_timeout_stream = 10
+net.netfilter.nf_conntrack_max = 2621440
+
+Estos son parte de los settings que uso en servidores; sobre todo el algoritmo de congestion, que por defecto en Debian viene en cubic y el MTU que viene por defecto en 1500.
+
+Saludos!
+
+
+------------------------------
+
+La memoria RAM se debe calcular en base a ciertos factores, entre ellos la cantidad de RAM disponible y la cantidad de RAM que cada servicio puede tomar:
+
+Ejemplo:
+
+# memory
+kernel.sem = 100 32000 100 128
+kernel.shmall = 536870912
+kernel.shmmax = 15461882265
+kernel.shmmni = 8192
+kernel.msgmnb = 65536
+kernel.msgmax = 65536
+
+shmmax se debe configurar en servidores hasta un 90% de la memoria física del sistema.
+
+Como estás lo determinas con:
+
+ipcs -l
+
+------ Shared Memory Limits --------
+max number of segments = 8192
+max seg size (kbytes) = 1048576
+max total shared memory (kbytes) = 2147483648
+min seg size (bytes) = 1
+
+------ Semaphore Limits --------
+max number of arrays = 128
+max semaphores per array = 100
+max semaphores system wide = 32000
+max ops per semop call = 100
+semaphore max value = 32767
+
+------ Messages Limits --------
+max queues system wide = 29519
+max size of message (bytes) = 65536
+default max size of queue (bytes) = 65536
+
+

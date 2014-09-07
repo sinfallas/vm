@@ -1,0 +1,85 @@
+#!/bin/bash
+#elaborado por sinfallas
+source variables
+echo "$(date +%d/%m/%Y-%r) ========== Inicio del sistema" >> $log
+ifconfig eth0 down
+tunctl
+ifconfig tap0 up
+brctl addbr br0
+brctl addif br0 eth0
+brctl addif br0 tap0
+brctl stp br0 off
+ifconfig eth0 0.0.0.0 up
+ifconfig br0 up
+modprobe virtio_balloon
+service qemu-kvm start
+vde_switch -d -F --macaddr $mac -g $switchg -p $pid/switch1.pid -s $sock1 -M $sock1/switch1.mgmt --mgmtgroup $switchg
+vde_switch -d -F --macaddr $mac -g $switchg -p $pid/switch2.pid -s $sock2 -M $sock2/switch2.mgmt --mgmtgroup $switchg
+#-------------------------------------
+#hacer un for para esta parte
+if [[ $run1 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm1\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm1" >> $log
+$vmc1
+$tiempo
+fi
+if [[ $run2 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm2\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm2" >> $log
+$vmc2
+$tiempo
+fi
+if [[ $run3 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm3\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm3" >> $log
+$vmc3
+$tiempo
+fi
+if [[ $run4 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm4\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm4" >> $log
+$vmc4
+$tiempo
+fi
+if [[ $run5 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm5\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm5" >> $log
+$vmc5
+$tiempo
+fi
+if [[ $run6 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm6\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm6" >> $log
+$vmc6
+$tiempo
+fi
+if [[ $run7 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm7\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm7" >> $log
+$vmc7
+$tiempo
+fi
+if [[ $run8 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm8\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm8" >> $log
+$vmc8
+$tiempo
+fi
+if [[ $run9 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm9\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm9" >> $log
+$vmc9
+$tiempo
+fi
+if [[ $run10 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm10\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm10" >> $log
+$vmc10
+$tiempo
+fi
+if [[ $run11 = 1 ]]; then
+echo -e "\e[00;31mIniciando $vm11\e[00m"
+echo "$(date +%d/%m/%Y-%r) Iniciando $vm11" >> $log
+$vmc11
+$tiempo
+fi

@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# The file which will save the current position in the job
+BREAKPOINT=/mydir/breakpoint
+MAXPROCEDURE=3
+#
+# All the global variables should be declared here
+#
+
+save_break_point()
+{
+  echo $BP >$BREAKPOINT
+}
+
+procedure_1()
+{
+  # First part of the job
+  echo procedure 1
+}
+
+procedure_2()
+{
+  # Second part of the job
+  echo procedure 2
+}
+
+procedure_3()
+{
+  # Third part of the job
+  echo procedure 3
+}
+
+#
+# Initial state
+[ -e $BREAKPOINT ] && BP=`cat $BREAKPOINT | sed 's/^\([0-9]*\).*$/\1/'`
+[ "$BP" = "" ] && BP=1
+
+# Process each function based on the breakpoint
+
+while [ $BP -le $MAXPROCEDURE ]
+do
+  procedure_$BP
+  save_break_point
+  BP=`expr $BP + 1`
+done
+[ -e $BREAKPOINT ] && rm -f $BREAKPOINT

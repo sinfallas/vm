@@ -1,0 +1,500 @@
+ Proteger el ancho de banda
+
+Cada usuario tiene tendencia a utilizar el 100% del ancho de banda disponible, no sé si esto es una ley escrita, si no debería estarlo.
+
+Pues ahora que tenemos instalada la red y el acceso mediante proxy cache vamos a intentar regular el consumo de ancho de banda. Resulta interesante que nadie pueda cometer abusos y consumir todos los recursos de la red a costa del resto de usuarios. La regulación del ancho de banda se puede llevar a cabo utilizando distintos criterios: la máquina origen, la dirección o página destino o el tipo de transferencia.
+
+Por un lado podemos intentar discriminar el origen de los datos, resumiendo que los jefe dispongan de mejor conexión que los "pringaos". Resumiendo, vamos a asignar distintos anchos de banda a distintos rangos de direcciones IP.
+
+También se no puede dar el caso de que haya consultas masivas a unos determinados dominios o páginas y puede ser práctico delimitar el ancho de banda asignado a ese dominio.
+
+En general el volumen de tráfico que genera el acceso a páginas web en html es bastante bajo, lo que realmente consume un volumen apreciable del ancho de banda son ficheros de sonido e imagen y una medida posible podría ser limitar de alguna forma la transferencia de estos tipos de ficheros.
+
+Otra posibilidad sería que limitar el ancho de banda sólo para descargas de ficheros grandes y dejar un mayor ancho de banda a ficheros pequeños para que la navegación por páginas html sea más rápida.
+
+Mediante Squid podemos establecer límites al ancho de banda mediante una de sus características de configuración denominada "delay pools". Establecemos una definición de regulación de ancho de banda, establecemos una ACL y asociamos la regulación a la ACL.
+Parámetros de configuración
+
+Cada una de las reglas de regulación está definida por un número entero que vamos a utilizar para indentificarlo en los distintos parámetros.
+delay_pools
+
+Esta parámetro se utiliza para definir cuantas reglas de regulación vamos a definir.
+delay_class
+
+Este parámetro toma dos argumentos el primero el identificador de la regla y en segundo lugar el tipo (clase) de la regla.
+
+El primero argumento es un número entero para identificar la regla.
+
+El segundo argumento puede ser 1,2 ó 3 para indicar uno de estos tipos de reglas.
+delay_parameters
+
+establece los valores de la regla. Los argumentos de este parámetro son parejas de valores velocidad/tamaño, donde velociad es un número entero que indica una velocidad en bytes por segundo (B/s), y tamaño indica el número de bytes de reserva que se transmiten antes de aplicar la velocidad de transferencia.
+
+Es decir cada pareja especifica el número de bytes de margen que se permiten antes de se haga efectiva la restricción de velocidad.
+
+Los valores no tienen por qué ser múltiplos de 2.
+Tipos de reglas
+
+Hay tres clases de regulaciones, con características diferentes.
+Clase 1
+
+La clase uno consiste en un canal individual compartido por todos los usuarios. Es la clase más simple, todas las tasas de descarga van juntas y lo único que tenemos que especificar es la velocidad, en bytes por segundo, y el número de bytes a partir de los cuales tiene que retardar la descarga.
+
+Ejemplo: Supongamos que queremos que la velocidad de descarga de los ficheros .wmv que ocupen más de 1Mb sea de 8k/s.
+
+delay_pools 1
+
+delay_class 1 1
+
+delay_parameters 1 8192/1048576
+
+acl ficheros_wmv url_regex \.wmv$
+
+delay_access 1 allow ficheros_wmv
+
+Cuando en esa red, algún equipo haya bajado más de 1Mb correspondiente a ficheros .wmv entonces la descarga total de ficheros .wmv se hará a una velocidad de 8k/s. Si quisiéramos establecer este límite para los hosts de una red deberíamos elegir la clase 2.
+
+En el anterior ejemplo hemos supuesto que hay un único canal de regulación en el parámetro delay_pools. Ahora vamos a ver un ejemplo con dos canales de clase 1. Queremos que el tráfico de la red local no tenga límite de transferencia, mientras que para las conexiones a internet vamos a utilizar un total de 256Kbits/s.
+
+delay_pools 2
+
+delay_class 1 1
+
+delay_parameters 1 -1/-1
+
+acl red_local src 192.168.0.0/24
+
+delay_access 1 allow red_local
+
+delay_class 2 1
+
+delay_parameters 2 32768/1024
+
+acl resto all src 0.0.0.0/0.0.0.0
+
+delay_access 2 allow resto
+
+La tasa de transferencia viene especificada en bytes por segundo, por ejemplo convirtiendo a otras unidades uno de los parámetros de delay_parameters:
+
+32768 B/s = 32 KB/s = 32 x 8 Kb/s (bits) = 256 Kb/s = 256 Kbits/s
+
+El valor 1024 es un número de bytes lo suficientemente pequeño para que se alcance pronto y se estabilice el ancho de banda.
+
+El valor -1 indica ilimitado.
+
+Las regulaciones de clase 1 están diseñadas para evitar que la acl correspondiente consuma todo el ancho de banda, es decir definen la suma máxima de los anchos de banda de todos los clientes, pero no evita que un cliente pueda consumir ese ancho de banda a costa de otro; todos os clientes comparten un máximo ancho de banda.
+Clase 2
+
+La clase dos que consiste en un canal común con 256 canales individuales. Es decir tenemos un canal global y dentro de él otros 256 canales que se aplican a las máquinas de una red de clase C.
+
+Ahora vamos a ver otro ejemplo con dos canales, en este caso ambos de de clase 2. Ahora también que el tráfico de la red local no tenga límite de transferencia, ni global ni por IP, mientras que para las conexiones a internet vamos a utilizar un total de 256Kbits/s y a cada máquina de la red le asigna un máximo de 64kbits/s.
+
+delay_pools 2
+
+delay_class 1 2
+
+delay_parameters 1 -1/-1 -1/-1
+
+acl red_local src 192.168.0.0/24
+
+delay_access 1 allow red_local
+
+delay_class 2 2
+
+delay_parameters 2 32768/1024 8192/1024
+
+acl resto all src 0.0.0.0/0.0.0.0
+
+delay_access 2 allow resto
+
+Este ejemplo es muy parecido al anterior de clase 1, sólo tenemos que agregarle una pareja de valores al parámetro "delay_parameters". La primera pareja de este parámetro especifica el ancho de banda global, mientras que la segunda pareja especifica el ancho de banda por host.
+
+Hay que tener en cuenta que los clientes están limitados por el tamaño del canal más pequeño, por lo que no tiene sentido que el canal común tenga un tamaño menor que los canales individuales.
+Clase 3
+
+La clase tres que define un canal común que contiene 256 canales de red, 65536 canales individuales. Muy parecida a la clase dos pero par redes de clase B.
+
+Hay que tener en cuenta que los clientes están limitados por el tamaño del canal más pequeño, por lo que no tiene sentido que el canal común tenga un tamaño menor que los canales individuales.
+Ejemplos de control de ancho de banda
+Limitación global del ancho de banda
+
+Tenemos una conexión con internet de 4Mbits y queremos que el ancho de banda dedicado a consulta de páginas web desede las IP comprendidas entre 192.168.5.100 hasta 192.168.5.199 sea de 1Mbits máximo.
+
+1Mb/s = 128kB/s = 131072 B/s
+
+4Mb/s = 512kB/s = 524288 B/s
+
+delay_pools 1
+
+delay_class 1 1
+
+delay_parameters 1 131072/8192
+
+acl lista src 192.168.5.100-192.168.5.199/32
+
+delay_access 1 allow lista
+
+Limitación de ancho de banda por red y host
+
+Tenemos una conexión con internet de 4Mbits y queremos que el ancho de banda dedicado a consulta de páginas web desede las IP comprendidas entre 192.168.5.100 hasta 192.168.5.199 sea de 1Mbits máximo, de forma que cada una de las máquinas no pueda consumir más de 512Kbits/s.
+
+Es como el ejemplo anterior, pero añadiendo restricciones adicionales a cada una de las máquinas, por lo que tendremos que elegir la clase 2:
+
+delay_pools 1
+
+delay_class 1 2
+
+delay_parameters 1 131072/8192 65536/8192
+
+acl lista src 192.168.5.100-192.168.5.199/32
+
+delay_access 1 allow lista
+
+Limitación de ancho de banda por servidor
+
+Queremos limitar el ancho de banda a 4KB/s y que cada máquina consuma a lo sumo 2KB/s para todas las conexiones que se hagan a los servidores de banner cuyo nombre empieza por ad.
+
+delay_pools 1
+
+delay_class 1 2
+
+delay_parameters 1 4096/4096 2048/2048
+
+acl publicidad url_regex http://ad.*
+
+delay_access 1 allow publicidad
+
+Ancho de banda ilimitado para la red local
+
+Garantizar un ancho de banda ilimitado para los accesos a la red local
+
+delay_pools 1
+
+delay_class 1 2
+
+delay_parameters 1 -1/-1 -1/-1
+
+acl redlocal url_regex -i 192.168
+
+delay_access 1 allow redlocal
+
+Establecer privilegios de acceso
+
+Establecer privilegios en la red
+
+delay_pools 3
+
+delay_class 1 1
+
+delay_class 2 1
+
+delay_class 3 1
+
+delay_parameters 1 -1/-1
+
+delay_parameters 2 131072/8192
+
+delay_parameters 3 65536/8192
+
+acl jefes src 192.168.5.1-192.168.5.50/32
+
+acl subjefes src 192.168.5.51-192.168.5.99/32
+
+acl resto src 0/0
+
+delay_access 1 allow jefes
+
+delay_access 2 allow subjefes
+
+delay_access 3 allow resto
+
+Ancho de banda en horarios distintos
+
+Limitar el ancho de banda en una franja de horario
+
+acl todos src 0/0
+
+acl laboral time 08:30-16:30
+
+delay_pools 2
+
+delay_class 1 2
+
+delay_parameters 1 -1/-1 -1/-1
+
+delay_access 1 allow todos
+
+delay_class 2 2
+
+delay_parameters 2 131072/8192 65536/8192
+
+delay_access 2 allow laboral
+
+delay_access 2 deny !laboral
+
+delay_access 2 allow todos
+
+Configuración de los navagadores clientes
+
+Esta configuración exige que cada navegador esté configurado para utilizar el proxy. Pero claro, por una lado es un engorro tener que configurar uno a uno todos los equipos de la red y por otro, tenemos la posibilidad de que la configuración TCP/IP le da salida a través de una pasarela.
+
+Si a pesar de todo queremos esta configuración, tendremos que decirle al navegador que utilice como proxy el equipo que alberga Squid y el puerto el 3128. El puerto se puede cambiar en el fichero de configuración. Otro puerto que se suele usar para proxy es el 8080, pero ¿para qué cambiarlo?
+Proxy Transparente
+
+Como queremos evitar tener que configurar los navegadores cliente y queremos evitar posibles puertas traseras de salida vamos a configurar un proxy transparente.
+
+¿Qué es un proxy transparente? Es un proxy que no necesita ninguna configuración especial en los clientes. Se denomina transparente porque el cliente en realidad no sabe que lo está usando, es transparente para él.
+
+Cómo configurar el proxy transparente, pues en primer lugar tenemos que configurar el cortafuegos para que reenvíe todas las peticiones que se hagan a un puerto 80 hacia el puerto 3128 que utiliza Squid. Es decir, capturamos todas las peticiones que se hagan a un servidor http y se las enviamos a Squid para que él se encarge del resto.
+
+Estas son las reglas de iptables. La primera para redrigir las peticiones al proxy la siguiente para rechazar el resto de los reenvíos.
+
+Si queremos que las páginas web pasen por el proxy con squid que está en 192.168.5.254, pero el resto siga con acceso normal, pondríamos:
+
+iptables -t nat -A PREROUTING -i eth1 -p tcp -m tcp --dport 80 -j DNAT --to-destination 192.168.5.254:3128
+
+Si el equipo con squid está en la misma pasarela entonces podemos poner:
+
+iptables -t nat -A PREROUTING -i eth1 -p tcp --dport 80 -j REDIRECT --to-port 3128
+
+Cuidado, de las opciones anteriores sólo debemos escoger una de ellas.
+
+Si sólo queremos salida para visitar págias web, entonces pondremos:
+
+Primero garantizamos el tráfico DNS:
+
+iptables -A FORWARD -p tcp -m tcp --dport 53 -j ACCEPT
+
+optables -A FORWARD -p udp -m udp --dport 53 -j ACCEPT
+
+iptables -A FORWARD -p tcp -m tcp --sport 53 -j ACCEPT
+
+iptables -A FORWARD -p udp -m udp --sport 53 -j ACCEPT
+
+En el siguiente caso suponemos que el equipo con squid está en 192.168.5.254:
+
+iptables -A PREROUTING -i eth1 -p tcp -m tcp --dport 80 -j DNAT --to-destination 192.168.5.254:3128
+
+iptables -t nat -A FORWARD -j REJECT --reject-with icmp-port-unreachable
+
+Si el equipo con squid está en la misma pasarela entonces podemos poner:
+
+iptables -t nat -A PREROUTING -i eth1 -p tcp --dport 80 -j REDIRECT --to-port 3128
+
+iptables -A FORWARD -j REJECT --reject-with icmp-port-unreachable 
+
+--------------------------------------------------------------------------------------------------
+
+Delay Pools 
+
+Delay pools es la respuesta de Squid frente al control de ancho de banda y el traffic shaping (catalogación de tráfico). Esto se realiza limitando el rate que el Squid retorna los datos desde su cache.
+
+Los delay pools son en esencia "cubos de ancho de banda” (bandwidth buckets). La solicitud a una respuesta es demorada hasta que cierta cantidad de ancho de banda esté disponible desde un cubo. Squid llena con cierta cantidad de tráfico los cubos por cada segundo y los clientes del Cache consumen los datos llenados desde esos cubos.
+
+El tamaño de un cubo determina cuánto límite de ancho de banda está disponible en un cliente. Si un cubo se encuentra lleno, un cliente puede descargar a máxima velocidad de la conexión disponible(sin limitación de rate) hasta que éste se vacíe. Después que se vacíe recibirá el límite de tráfico asignado.
+
+Se requiere varios conceptos que Squid usa para el control de Delay Pools:
+
+    Listas de control de acceso (Access rules)
+    Clases de Delay Pools (Delay pool classes)
+    Tipo de cubos (buckets)
+
+ 
+
+Secuencia lógica:
+
+    Squid verifica en qué delay_access te encuentras
+    Si concuerda con una, esta apunta hacia un delay pool específico
+    Cada delay pool tiene una clase: 1 , 2 , 3.
+    La clase determina que tipo de cubo estás usando. Squid tiene 3 tipos: Global (agregate), individual , red (network)
+        La clase 1 tiene un único cubo Global (agregate)
+        La clase 2 tiene un cubo Global (agregate) y 256 cubos Individual
+        La clase 3 tiene un cubo Global (agregate) y 256 cubos de Red y 65536 cubos Individual.
+
+
+Puede uno desactivar cubos que no van a ser utilizados, por ejemplo en la clase 2 puede uno desactivar el cubo global y solo utilizar los cubos Individual.
+
+Por razones obvias se toma siempre el ancho de banda menor. Por ejemplo, considere la posibilidad de una clase 3 cubos agregate, network e Individual. Si tiene en Individual 20 KB, En network 30 KB, pero el agregate tiene 2 KB, el cliente recibirá sólo 2-KB.
+
+  
+
+Directivas: 
+
+    delay_pools: Define cuantos delay pools se van a utilizar
+        Ejemplo:
+            delay_pool 5: Define 5 Delay pools que serán configurados posteriormente.
+
+    delay_class: Define la clase del delay pool. Para evitar complicaciones es recomendable tener siempre un delay_class para cada delay pool definido.
+
+        Ejemplo:
+            delay_class 1 3   ( Define el delay pool 1 que sea de tipo 3).
+            delay_class 5 2   (Define el delay pool 5 que sea de tipo 2).
+
+    delay_parameters: Este es el parámetro crítico en el cual se limita el ancho de banda. Para cada Delay Pool se debe definir: el fill rate (tráfico de llenado) y el tamaño máximo de cada cubo.
+
+delay_parameters N rate/size [rate/size [rate/size]] 
+
+
+El valor del rate está definido en bytes por segundo y size en total de bytes.
+
+Si se divide el size entre el rate, Dispondrás el tiempo en segundos que el cubo se llenará si el cliente no está consumiendo. 
+
+
+Una Pool de clase 1 que dispone de un solo cubo sería definido como sigue:
+
+delay_class 2 1
+delay_parameters 2 2000/8000 
+
+
+Para un Pools de clase 2, El primer cubo es aggregate y el segundo es un grupo de cubos individuales:
+
+delay_class 4 2
+delay_parameters 4 7000/15000 3000/4000 
+
+ 
+
+De esta forma la red "toda la red" dispondrá en los primeros 15 Kb (tamaño del cubo) descarga a velocidad máxima sin restricción, despues de haber descargado los primeros 15Kb (se vació el cubo), descargará a 7KB. Igualmente cada cliente solo podrá descargar rápidamente los primeros 4Kb , después descargará establemente siempre a 3 Kb. 
+ 
+
+    delay_initial_bucket_level: Dice que tan lleno estará el cada cubo al iniciar el Squid. Se indica en porcentajes
+
+delay_initial_bucket_level 75%
+
+ 
+
+    delay_access: permite relacionarlo a una ACL específica. Es similar a las reglas de acceso de Squid , pero es necesario definir el número de Pool antes del allow o deny. 
+
+delay_access 1 deny gerentes
+delay_access 1 allow mi_red
+delay_access 5 allow mime_extensiones
+
+Squid define una lista de acceso separada para cada Delay Pool. Puede disponer de un allow o un deny. Si es allow utiliza esa regla y no sigue buscando en las siguientes de ese Pool. Si es deny, automáticamente cancela la búsqueda en ese Pool, pero seguirá buscando en las listas de acceso de los otros pools.
+
+
+http://es.geocities.com/jtnozawa/delaypoolsCaso_1.jpg
+
+   
+
+http://es.geocities.com/jtnozawa/delaypoolsCaso_2.jpg 
+
+ 
+
+Ejemplos:
+
+    Limita a todo el mundo a 64 KBytes y mantiene 1 MB en reserva si Squid está inactivo:
+
+ 
+
+delay_pools 1
+delay_class 1 1
+delay_parameters 1 65536/1048576
+
+ 
+
+acl All src 0/0
+delay_access 1 allow All
+
+    No se va a utilizar los cubos de Red. Nuestro ancho de banda Global es de 64 KB/s, pero se limitará a cada uno de los 65536 posibles clientes en 16 Kbit/s.
+
+ 
+
+delay_pools 1
+delay_class 1 3
+delay_parameters 1 65536/1048576 -1/-1 16384/262144
+
+ 
+
+acl All src 0/0
+delay_access 1 allow All
+
+ 
+
+# -1 significa ilimitado
+
+ 
+
+    Por clase de servicio. Usamos las acl gerentes, con 65 KB y los demás con 10 KB. Adicionalmente se limita la descarga por mime a 5Kb pero no a los gerentes.
+
+ 
+
+delay_pools 3
+delay_class 1 1
+delay_class 2 1
+delay_class 3 1
+
+ 
+
+delay_parameters 1 65536/1048576
+delay_parameters 2 10000/50000
+delay_parameters 3 5000/30000
+
+ 
+
+acl Gerentes src 192.168.8.0/22
+acl Todos src 0/0
+acl extensiones rep_mime_type "/etc/squid/mis_tipos_mime"
+
+ 
+
+delay_access 1 allow Gerentes
+delay_access 2 allow Todos
+delay_access 3 deny gerentes
+delay_access 3 allow extensiones
+
+ 
+
+  
+
+Caso Real:  /etc/squid/squid.conf
+
+# 3 acl .. red local, conjunto de extensiones y una IP especifica
+
+acl mi_red src 192.168.1.0/24
+acl extdown url_regex -i "/etc/squid/extdown"
+aclunaPC src 192.168.1.46
+
+delay_pools 2
+# Se define un delay pool N1 de tipo clase 2
+# se le asigna a : unaPC
+# se limita 13Kb rate / 13Kb Max para la red
+# se limita 6 Kb rate / 6 Kb Max por IP
+
+delay_class 1 2
+delay_access 1 allow unaPC
+delay_access 1 deny all
+delay_parameters 1 13000/13000 6095/6095
+
+# Se define un delay pool N2 de tipo clase 2
+# se le asigna a las extensiones : extdown
+# se limita 4Mb rate / 1Mb Max para la red
+# se limita 15 Kb rate / 500 Kb Max por IP
+
+delay_class 2 2
+delay_access 2 allow extdown
+delay_access 2 deny all
+delay_parameters 2 4000000/1000000 15000/500000
+
+ 
+
+Preguntas rápidas para ociosos:
+
+ 
+
+    No entendí nada eso de los cubos, solo quiere saber como se limita la red 1: 100 KB    y  la red 2 : 10 KB
+
+    En un caso rápido de no aplicar el concepto de cubos, es posible asignar el tamaño del cubo el mismo que el del rate. Usando la gráfica como ejemplo,  podría decirse que si el cubo es el mismo tamaño que el del rate, es como si el cubo no existiera :
+    http://es.geocities.com/jtnozawa/delay_pools_3.jpg
+
+    acl red1 src 192.168.1.0/24        # red 1
+    acl red2 src 192.168.2.0/24       # red 2
+    delay_pools 2                     # voy a tener 2 delay pools
+
+    delay_class 1 1                   # el delay pool 1  es de clase 1
+    delay_class 2 1                    # el delay pool 2  es de clase 1
+
+    delay_access 1 allow red1          # el delay pool 1  para la red 1
+    delay_access 2 allow red2          # el delay pool 2  para la red 2
+
+    delay_parameters 1 100000/100000   # el delay pool 1  con 100 Kb
+    delay_parameters 2 10000/10000     # el delay pool 2  con 10 Kb
+

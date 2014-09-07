@@ -1,0 +1,117 @@
+
+iptables -P INPUT DROP  
+iptables -P FORWARD DROP 
+iptables -P OUTPUT ACCEPT  
+# Eliminamos todas la reglas anteriores que puedieran existir 
+
+iptables -F INPUT
+iptables -F FORWARD
+iptables -F OUTPUT
+iptables -F -t nat  
+
+iptables -A OUTPUT -o lo -j ACCEPT  
+
+iptables -N flood  iptables -F flood  iptables -A flood -m limit --limit 30/second --limit-burst 60 -j RETURN
+iptables -A flood -m limit --limit 30/second --limit-burst 60 -j LOG --log-prefix "flood: "  iptables -A flood -j REJECT  
+
+# Filtrado ICMP 
+iptables -N ICMP_NON
+iptables -F ICMP_NON
+iptables -A ICMP_NON -p icmp --icmp-type redirect -j REJECT
+iptables -A ICMP_NON -p icmp --icmp-type router-advertisement -j REJECT
+iptables -A ICMP_NON -p icmp --icmp-type router-solicitation -j REJECT
+iptables -A ICMP_NON -p icmp --icmp-type address-mask-request -j REJECT 
+iptables -A ICMP_NON -p icmp --icmp-type address-mask-reply -j REJECT  
+
+
+# Filtramos mal formados
+iptables -N PKT_FAKE
+iptables -F PKT_FAKE
+iptables -A PKT_FAKE -m state --state INVALID -j REJECT
+iptables -A PKT_FAKE -p tcp ! --syn -m state --state NEW -j REJECT
+iptables -A PKT_FAKE -f -j REJECT  
+
+# Filtramos los paquetes con combinaciones de flags no permitidas
+iptables -N FLAG_SCAN
+iptables -F FLAG_SCAN
+iptables -A FLAG_SCAN -p tcp --tcp-fiags SYN,FIN SYN,FIN -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags SYN,RST SYN,RST -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags ALL FIN -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags SYN,FIN,PSH SYN,FIN,PSH -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags SYN,FIN,RST SYN,FIN,RST -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags SYN,FIN,RST,PSH SYN,FIN,RST,PSH -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags ALL ACK,RST,SYN,FIN -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags ALL NONE -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags ALL ALL -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags ALL FIN,URG,PSH -j REJECT
+iptables -A FLAG_SCAN -p tcp --tcp-fiags ALL SYN,RST,ACK,FIN,URG -j REJECT  
+
+
+ 
+# Filtrado de direcciones en la que no se ha iniciado la conexión desde dentro de la subred 
+iptables -A INPUT -i$IN_IFACE -p tcp ! --syn -m state --state NEW -j DROP  
+# Pasamos los fitros definidos anteriormente
+iptables -A INPUT -i$IN_IFACE -p tcp -j fiood
+iptables -A INPUT -i$IN_IFACE -p tcp -j ICMP_NON
+iptables -A INPUT -i$IN_IFACE -p tcp -j PKT_FAKE
+iptables -A INPUT -i$IN_IFACE -p tcp -j FLAG_SCAN
+iptables -A INPUT -i$IN_IFACE -p tcp -j FLAG_SCAN
+# Denegamos el udp y icmp
+iptables -A INPUT -i$IN_IFACE -p udp -j DROP
+iptables -A INPUT -i$IN_IFACE -p icmp -j DROP  
+## Filtros para la interfaz eth1, de acceso a los servidores
+ 
+## Pasamos los fitros definidos anteriormente a todo el tráfico que se dirija a los servidores
+iptables -A OUTPUT -i$SERVER_IFACE-p tcp -j flood
+iptables -A OUTPUT -i$SERVER_IFACE -p tcp -j ICMP_NON
+iptables -A OUTPUT -i$SERVER_IFACE -p tcp -j PKT_FAKE
+iptables -A OUTPUT -i$SERVER_IFACE -p tcp -j FLAG_SCAN
+iptables -A OUTPUT -i$SERVER_IFACE -p tcp -j FLAG_SCAN  
+# Denegamos el udp y icmp a todo el tráfico que se dirija a los servidores
+iptables -A OUTPUT -i$SERVER_IFACE- -p icmp -j DROP  
+# Aceptamos solamente el tráfico que venga de nuestra red 
+iptables -A INPUT -i$CLIENTS_IFACE -s 10.10.1.0/24 -p tcp -j ACCEPT
+
+ ## Filtros para la interfaz eth2, de acceso a los clientes
+ 
+## Pasamos los fitros definidos anteriormente a todo el tráfico que se dirija a los clientes o venga de
+ 
+# ellos
+iptables -A OUTPUT -i$CLIENTS_IFACE-p tcp -j flood
+iptables -A OUTPUT -i$CLIENTS_IFACE -p tcp -j ICMP_NON
+iptables -A OUTPUT -i$CLIENTS_IFACE -p tcp -j PKT_FAKE
+iptables -A OUTPUT -i$CLIENTS_IFACE -p tcp -j FLAG_SCAN
+iptables -A OUTPUT -i$CLIENTS_IFACE -p tcp -j FLAG_SCAN
+iptables -A INPUT -i$CLIENTS_IFACE-p tcp -j flood
+iptables -A INPUT -i$CLIENTS_IFACE -p tcp -j ICMP_NON
+iptables -A INPUT -i$CLIENTS_IFACE -p tcp -j PKT_FAKE
+iptables -A INPUT -i$CLIENTS_IFACE -p tcp -j FLAG_SCAN
+iptables -A INPUT -i$CLIENTS_IFACE -p tcp -j FLAG_SCAN  
+
+
+
+
+
+
+
+
+
+ function aplicar_routing(){ 
+#
+ 
+# Mandamos las peticiones de los clientes a los servidores internos
+ 
+#
+ 
+# Enviamos el tráfco al servidor web
+ iptables -A POSTROUTING -t nat -s 10.10.3.0/24 -o eth1 -d 10.10.1.10  –dport 80 -j SNAT --to-source x 10.10.1.1  
+# Enviamos el tráfco al servidor MySQL
+ iptables -A POSTROUTING -t nat -s 10.10.3.0/24 -o eth1 -d 10.10.1.11  –dport 3306 -j SNAT --to-source x 10.10.1.1  
+# Enviamos el tráfco al servidor SubVersion
+ iptables -A POSTROUTING -t nat -s 10.10.3.0/24 -o eth1 -d 10.10.1.12  –dport 3690 -j SNAT --to-source x 10.10.1.1  
+#
+ 
+# Habilitamos el acceso a internet para el proxy 
+ 
+#
+ iptables -A POSTROUTING -t nat -s 10.10.3.0/24 -o eth1 -j MASQUERADE  }[…] start) echo "Arrancando iptables"  aplicar_reglas aplicar_routing echo "Iptables arrancado"

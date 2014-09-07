@@ -1,0 +1,13 @@
+#!/bin/bash
+# elaborado por sinfallas
+if [ $USER != root ]; then
+echo -e "\e[00;31mERROR DEBES SER ROOT\e[00m"
+exit 0
+fi
+clear
+apt-get update
+apt-get -y dist-upgrade
+apt-get -y -f install
+dpkg --configure -a
+apt-get -y autoremove
+exit 0

@@ -1,0 +1,35 @@
+#!/bin/bash
+echo "deb http://deb.torproject.org/torproject.org lucid main" >> /etc/apt/sources.list
+gpg --keyserver keys.gnupg.net --recv 886DDD89
+gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -
+apt-get update
+aptitude -y install tor tor-geoipdb polipo socat tsocks vpnc vidalia
+clear
+/etc/init.d/polipo stop
+/etc/init.d/tor stop
+echo -e "IPSec ID hss""\n""IPSec secret hss""\n""IPSec gateway 68.68.107.101""\n""Xauth password rk59j8""\n""Xauth username rk59j8" >> hotspot.conf
+mv -f hotspot.conf /etc/vpnc/
+echo -e "proxyAddress = \"127.0.0.1"\""\n""proxyPort = 8118""\n""allowedClients = 127.0.0.1""\n""allowedPorts = 1-65535""\n""proxyName = \"localhost"\""\n""cacheIsShared = false""\n""socksParentProxy = \"localhost:9050"\""\n""socksProxyType = socks5""\n""chunkHighMark = 67108864""\n""diskCacheRoot = \""\""\n""localDocumentRoot = \""\""\n""disableLocalInterface = true""\n""disableConfiguration = true""\n""dnsUseGethostbyname = yes""\n""disableVia = true""\n""censoredHeaders = from,accept-language,x-pad,link""\n""censorReferer = maybe""\n""maxConnectionAge = 5m""\n""maxConnectionRequests = 120""\n""serverMaxSlots = 8""\n""serverSlots = 2""\n""tunnelAllowedPorts = 1-65535" >> config
+mv -f config /etc/polipo/
+cd ..
+echo -e "#!/bin/bash""\n""clear""\n""vpnc-connect hotspot""\n""/etc/init.d/tor start""\n""/etc/init.d/polipo start" >> encender
+echo -e "#!/bin/bash""\n""clear""\n""/etc/init.d/polipo stop""\n""/etc/init.d/tor stop""\n""vpnc-disconnect" >> apagar
+chmod 751 encender
+chmod 751 apagar
+mv -f /etc/rc2.d/S20tor /etc/rc2.d/K20tor
+mv -f /etc/rc2.d/S20polipo /etc/rc2.d/K20polipo
+mv -f /etc/rc3.d/S20tor /etc/rc3.d/K20tor
+mv -f /etc/rc3.d/S20polipo /etc/rc3.d/K20polipo
+mv -f /etc/rc4.d/S20tor /etc/rc4.d/K20tor
+mv -f /etc/rc4.d/S20polipo /etc/rc4.d/K20polipo
+mv -f /etc/rc5.d/S20tor /etc/rc5.d/K20tor
+mv -f /etc/rc5.d/S20polipo /etc/rc5.d/K20polipo
+clear
+echo Vaya a Sistema, Preferencias, Proxy de la red y marque la casilla "Usar el mismo proxy para todos los protocolos" 
+echo luego introduzca la siguiente configuracion 127.0.0.1 y puerto 8118 luego haga clic en "Aplicar a todo el sistema" y despues en "Cerrar".
+echo 
+echo Para conexiones SOCKS apunte a 127.0.0.1 y el puerto 9050
+echo
+echo Para iniciar utilice sudo ./encender y para detener sudo ./apagar
+echo 
+echo Instalacion Finalizada.

@@ -1,0 +1,54 @@
+Hoy vamos a hablar de un problema que tuvimos hace unos días con un equipo nuevo que estamos configurando.
+
+Al principio teníamos únicamente una IP para acceder a configurar y gestionar el equipo, la 172.16.1.10 (interfaz eth0). Más adelante, solicitamos que se añadiera otra interfaz de red, para poder dedicar una a configuración y gestión interna y otra a ofrecer el servicio al exterior. Por problemas en el direccionamiento, nos asignaron en la nueva interfaz otra IP de la misma subred local que la que ya teníamos, la 172.16.1.20 (interfaz eth1).
+
+Probando la nueva IP nos dimos cuenta de que, independientemente de la IP que yo solicitara, todo el tráfico llegaba al sistema por la misma interfaz: eth0. Es más, desde otro equipo de la misma subred, podía ver como ARP me indica que ambas IP se sirven por la misma interfaz física:
+
+$ arp -n
+Dirección      TipoHW  DirecciónHW         Indic Máscara     	Interfaz
+172.16.1.10    ether   aa:bb:cc:dd:ee:ff       C                    eth0
+172.16.1.1     ether   00:00:00:00:00:01       C                    eth0
+172.16.1.20    ether   aa:bb:cc:dd:ee:ff       C                    eth0
+
+La investigación en Internet fue bastante desalentadora hasta que averiguamos que este comportamiento se debe a que la pila IP implementada en Linux asigna por defecto las direcciones IP a todo el equipo, ya que se implementó pensando en maximizar la disponibilidad del equipo. De este modo, si cae una interfaz, el tráfico de todas las IP asociadas al equipo se redirigirá por la otra y el equipo, con todos sus servicios, seguirá estando disponible.
+
+Por suerte, este comportamiento por defecto se puede modificar para conseguir el funcionamiento que nosotros queremos, que es tener una IP diferente asignada única y exclusivamente a una interfaz de red. Para esta tarea utilizaremos la suite iproute, incluida por defecto en las distribuciones Debian y Ubuntu más actuales, así como el siguiente manual de enrutado avanzado y control de tráfico en Linux.
+
+Como queremos que el cambio sea persistente, modificaremos el fichero /etc/network/interfaces para añadir los siguientes valores al final de la definición de cada una de las interfaces implicadas:
+
+up ip route add 172.16.1.0/25 dev eth0 proto kernel scope link src 172.16.1.10 table 1
+up ip route add default via 172.16.1.1 dev eth0 table 1
+up ip rule add from 172.16.1.10 lookup 1
+
+Estas tres líneas crean una tabla de enrutado (table 1) en la que se indica que todo aquel tráfico que tenga como fuente la IP asignada a eth0 vaya únicamente por eth0. Para la otra interfaz añadiremos las mismas líneas, cambiando el nombre de la interfaz, la tabla, y la dirección IP. Además, para poder descargar actualizaciones del sistema u otros materiales que vengan de redes externas, debemos añadir una ruta de salida por defecto (esta vez sin asignar ningún valor de tabla):
+
+up ip route add default via 172.16.1.1 dev eth0
+
+Con todo lo anterior, la configuración completa quedaría como sigue:
+
+# cat /etc/network/interfaces
+iface lo inet loopback
+auto lo
+
+auto eth0
+iface eth0 inet static
+address 172.16.1.10
+network 172.16.1.0
+netmask 255.255.255.128
+broadcast 172.16.1.127
+up ip route add 172.16.1.0/25 dev eth0 proto kernel scope link src 172.16.1.10 table 1
+up ip route add default via 172.16.1.1 dev eth0 table 1
+up ip rule add from 172.16.1.10 lookup 1
+up ip route add default via 172.16.1.1 dev eth0
+
+auto eth1
+iface eth1 inet static
+address 172.16.1.20
+network 172.16.1.0
+netmask 255.255.255.128
+broadcast 172.16.1.127
+up ip route add 172.16.1.0/25 dev eth1 proto kernel scope link src 172.16.1.20 table 2
+up ip route add default via 172.16.1.1 dev eth1 table 2
+up ip rule add from 172.16.1.20 lookup 2
+
+

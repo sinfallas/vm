@@ -1,0 +1,146 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          xanadu
+# Required-Start:    qemu-kvm
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: xanadu start/stop script
+# Description:       xanadu start/stop script, elaborado por sinfallas
+### END INIT INFO
+source variables
+case "$1" in
+	start)
+	    if [[ -f $lock ]]; then
+	    	echo "Error: El sistema se esta ejecutando desde: "`cat $lock`""
+	    else
+	    	echo "$(date +%d/%m/%Y-%r)" > $lock
+		echo "$(date +%d/%m/%Y-%r) ========== Inicio del sistema" >> $log
+		#iniciar_red_xanadu
+		modprobe virtio_balloon
+		service qemu-kvm start
+		vde_switch -d -F --macaddr $mac -g $switchg -p $pid/switch1.pid -s $sock1 -M $sock1/switch1.mgmt --mgmtgroup $switchg
+		vde_switch -d -F --macaddr $mac -g $switchg -p $pid/switch2.pid -s $sock2 -M $sock2/switch2.mgmt --mgmtgroup $switchg
+		iniciar_vm_xanadu
+	    	echo "$(date +%d/%m/%Y-%r) Arranque Finalizado" >> $log
+	    fi
+	    exit 0
+	    ;;
+        pause)
+            if [[ -f $lock ]]; then
+	    	hacer=-19
+	    	echo "$(date +%d/%m/%Y-%r) Pausa del sistema" >> $log
+	    else
+	    	echo "El sistema NO se esta ejecutando"
+		echo "$(date +%d/%m/%Y-%r) Intento fallido de pausar el sistema porque el sistema NO se esta ejecutando" >> $log
+	    exit 0
+	    fi
+	    ;;
+	unpause)
+	    if [[ -f $lock ]]; then
+	    	hacer=-18
+	    	echo "$(date +%d/%m/%Y-%r) Se reanuda del sistema" >> $log
+	    else
+	    	echo "El sistema NO se esta ejecutando"
+		echo "$(date +%d/%m/%Y-%r) Intento fallido de reanudar el sistema porque el sistema NO se esta ejecutando" >> $log
+	    exit 0
+	    fi
+	    ;;	
+	stop)
+	    if [[ -f $lock ]]; then
+	    	hacer=-9
+	    	#finalizar_red_xanadu
+		finalizar_cable_xanadu
+		stop qemu-kvm
+    		rmmod virtio_balloon
+	    	rm -f $lock
+	    	echo "$(date +%d/%m/%Y-%r) Apagado del sistema" >> $log
+	    else
+	    	echo "El sistema NO se esta ejecutando"
+		echo "$(date +%d/%m/%Y-%r) Apagado fallido porque el sistema NO se esta ejecutando" >> $log
+	    exit 0
+	    fi
+	    ;;
+	restart)
+	    if [[ -f $lock ]]; then
+	    	hacer=-9
+	    	#finalizar_red_xanadu
+		finalizar_cable_xanadu
+		stop qemu-kvm
+    		rmmod virtio_balloon
+	    	rm -f $lock
+		echo "$(date +%d/%m/%Y-%r) Reinicio del sistema" >> $log
+	    else
+	    	echo "El sistema NO se esta ejecutando"
+		echo "$(date +%d/%m/%Y-%r) Intento fallido de reinicio del sistema porque el sistema NO se esta ejecutando" >> $log
+	    exit 0
+	    fi
+	    ;;
+	status)
+	    if [[ -f $lock ]]; then
+		echo "$(date +%d/%m/%Y-%r) ========== Verificacion Iniciada" >> $log
+		iniciar_status_xanadu
+	    	cat $log
+	    else
+	    	echo "$(date +%d/%m/%Y-%r) No se ejecuta la verificacion porque el sistema NO esta en ejecucion " >> $log
+		cat $log
+	    fi
+	    exit 0	    
+	    ;;
+	install)
+	    if [[ -f /usr/bin/xanadu-install ]]; then
+	    	echo "El sistema fue instalado en: "`cat /usr/bin/xanadu-install`""
+	    else
+	    	instalar_xanadu
+	    fi	    
+	    exit 0
+	    ;;	
+	view)
+	    if [[ -f $lock ]]; then
+		spicy --host=127.0.0.1 --port=9551
+	    else
+		echo "El sistema NO se esta ejecutando"
+	    fi
+	    exit 0
+	    ;;
+	cable)
+	    if [[ -f $lock ]]; then
+	    	iniciar_cable_xanadu
+	    else
+	    	echo "El sistema NO se esta ejecutando"
+		echo "$(date +%d/%m/%Y-%r) No se puede conectar el cable virtual porque el sistema NO se esta ejecutando" >> $log
+	    fi
+	    exit 0
+	    ;;	
+	*)
+            echo "USO: $0 {start|stop|restart|pause|unpause|status|install|view|cable}"
+	    exit 0
+	    ;;
+esac
+#----------
+echo "Accion $1 Switch Virtuales"
+if [[ -f $pid/switch1.pid ]]; then
+	kill $hacer "`cat $pid/switch1.pid`"
+fi
+if [[ -f $pid/switch2.pid ]]; then
+	kill $hacer "`cat $pid/switch2.pid`"
+fi
+echo "Accion $1 Maquinas Virtuales"
+for (( n=1; n<=$vmtotal; n++ ))
+do
+	ciclo=`echo $!vm$n`
+	if [[ -f $pid/${!ciclo}.pid ]]; then
+		kill $hacer "`cat $pid/${!ciclo}.pid`"
+	fi
+done
+#----------
+if [[ $1 = stop ]]; then
+	echo "Limpiando Entorno"
+	rm -f $pid/*.pid
+fi
+if [[ $1 = restart ]]; then
+	rm -f $pid/*.pid
+	iniciar_vm_xanadu
+	echo "$(date +%d/%m/%Y-%r) Reinicio finalizado" >> $log
+fi
+exit 0

@@ -1,0 +1,136 @@
+#!/bin/bash
+#elaborado por sinfallas
+source variables
+echo "$(date +%d/%m/%Y-%r) ========== Verificacion Iniciada" >> $log
+if [[ $run1 = 1 ]]; then
+	if [[ -f $pid/$vm1.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm1 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm1 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc1
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm1 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm1 NO esta programada para su inicio" >> $log
+fi
+if [[ $run2 = 1 ]]; then
+	if [[ -f $pid/$vm2.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm2 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm2 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc2
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm2 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm2 NO esta programada para su inicio" >> $log
+fi
+if [[ $run3 = 1 ]]; then
+	if [[ -f $pid/$vm3.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm3 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm3 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc3
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm3 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm3 NO esta programada para su inicio" >> $log
+fi
+if [[ $run4 = 1 ]]; then
+	if [[ -f $pid/$vm4.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm4 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm4 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc4
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm4 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm4 NO esta programada para su inicio" >> $log
+fi
+if [[ $run5 = 1 ]]; then
+	if [[ -f $pid/$vm5.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm5 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm5 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc5
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm5 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm5 NO esta programada para su inicio" >> $log
+fi
+if [[ $run6 = 1 ]]; then
+	if [[ -f $pid/$vm6.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm6 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm6 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc6
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm6 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm6 NO esta programada para su inicio" >> $log
+fi
+if [[ $run7 = 1 ]]; then
+	if [[ -f $pid/$vm7.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm7 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm7 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc7
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm7 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm7 NO esta programada para su inicio" >> $log
+fi
+if [[ $run8 = 1 ]]; then
+	if [[ -f $pid/$vm8.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm8 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm8 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc8
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm8 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm8 NO esta programada para su inicio" >> $log
+fi
+if [[ $run9 = 1 ]]; then
+	if [[ -f $pid/$vm9.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm9 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm9 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc9
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm9 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm9 NO esta programada para su inicio" >> $log
+fi
+if [[ $run10 = 1 ]]; then
+	if [[ -f $pid/$vm10.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm10 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm10 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc10
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm10 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm10 NO esta programada para su inicio" >> $log
+fi
+if [[ $run11 = 1 ]]; then
+	if [[ -f $pid/$vm11.pid ]]; then
+	echo "$(date +%d/%m/%Y-%r) $vm11 Esta programada para su inicio y se encuentra en ejecucion" >> $log
+	else
+	echo "$(date +%d/%m/%Y-%r) $vm11 Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+	$vmc11
+	$tiempo
+	echo "$(date +%d/%m/%Y-%r) $vm11 Puesta en marcha despues de presentar una falla" >> $log
+	fi
+else
+	echo "$(date +%d/%m/%Y-%r) $vm11 NO esta programada para su inicio" >> $log
+fi

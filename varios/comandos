@@ -1,0 +1,73 @@
+spicy --host=127.0.0.1 --port=9551
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+The KVM monitor is setup to listen on an Unix socket. It is possible to connect to it with: socat UNIX:/run/xanadu/xanadu.monitor -.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+prueba de velocidad de escritura en disco
+
+dd if=/dev/zero of=/home/sinfallas/test.out bs=8192k count=256
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+test de rendimiento ssh
+
+yes | pv | ssh $host "cat > /dev/null"
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+interfaces en las vm
+
+auto eth0
+iface eth0 inet static
+address 192.168.100.1
+netmask 255.255.255.0
+broadcast 192.168.100.255
+gateway 192.168.100.1
+dns-nameservers 192.168.100.1
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+interfaces en el anfitrion para crear el tap
+
+auto tap0
+iface tap0 inet manual
+tunctl_user sinfallas
+
+auto br0
+iface br0 inet manual
+bridge_ports eth0 tap0
+bridge_maxwait 0
+bridge_maxage 12
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Doing a dd like this doesn’t actually free up any space at all, because it’s making a direct copy of the old virtual disk.
+
+To make it free up space, you have to make a sparse disk and then recreate all the partitions, make the filesystems, and copy in the data with cp. Something like this:
+
+dd if=/dev/zero of=newdisk.raw bs=512 seek=42432505
+losetup -fv /path/to/newdisk.raw
+fdisk /dev/loop0
+mkfs.ext4 /dev/loop0p1
+mount /dev/loop0p1 /mnt/
+cp -a /olddisk/root/ /mnt/
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+como ejecutar comando via ssh
+
+ssh host -l user “`cat cmd.txt`”
+
+ssh host -l user $(<cmd.txt)
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+To disable virbr0
+
+# virsh net-destroy default
+# virsh net-undefine default
+# service libvirtd restart
+# ifconfig 

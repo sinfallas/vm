@@ -1,0 +1,37 @@
+#!/bin/bash
+# elaborado por sinfallas
+if [ $USER != root ]; then
+echo -e "\e[00;31mERROR DEBES SER ROOT\e[00m"
+exit 0
+fi
+update-pciids
+update-usbids
+echo -e "net.ipv6.conf.all.disable_ipv6 = 1""\n""net.ipv6.conf.default.disable_ipv6 = 1""\n""net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.d/60-disableipv6.conf
+start procps
+echo -e "vm.swappiness = 10""\n""vm.dirty_background_ratio = 15""\n""vm.dirty_ratio = 25""\n""vm.vfs_cache_pressure = 40""\n""vm.dirty_writeback_centisecs = 1500""\n""vm.mmap_min_addr = 4096""\n""kernel.shmmni = 4096""\n""kernel.shmall = 536870912""\n""kernel.shmmax = 2147483648""\n""# kernel.sched_autogroup_enabled = 1""\n""# kernel.sched_rt_runtime_us = 950000""\n""kernel.threads-max = 98006""\n""net.ipv6.conf.all.disable_ipv6 = 1""\n""net.ipv6.conf.default.disable_ipv6 = 1""\n""net.ipv6.conf.lo.disable_ipv6 = 1""\n""net.ipv6.conf.all.accept_redirects = 0""\n""net.ipv6.conf.all.accept_source_route = 0""\n""net.ipv4.conf.default.rp_filter=1""\n""net.ipv4.conf.all.rp_filter=1""\n""net.ipv4.conf.all.accept_redirects = 0""\n""net.ipv4.conf.all.send_redirects = 0""\n""net.ipv4.conf.all.accept_source_route = 0""\n""net.ipv4.tcp_timestamps = 0""\n""net.ipv4.tcp_sack = 1""\n""net.ipv4.tcp_window_scaling = 1""\n""net.core.rmem_max = 16777216""\n""net.core.wmem_max = 16777216""\n""net.ipv4.tcp_rmem = 4096 87380 16777216""\n""net.ipv4.tcp_wmem = 4096 65536 16777216""\n""net.ipv4.tcp_no_metrics_save = 1""\n""net.core.netdev_max_backlog = 2500""\n""fs.file-max = 307615""\n""fs.aio-max-nr = 1048576""\n""net.ipv4.tcp_moderate_rcvbuf = 1""\n""net.ipv4.tcp_syncookies=1""\n""kernel.kptr_restrict = 1""\n""fs.file-max = 307615""\n""fs.aio-max-nr = 1048576" >> /etc/sysctl.conf
+sysctl -p
+echo "* hard nproc 1000" >> /etc/security/limits.conf
+echo -e "tmpfs /tmp tmpfs defaults,noexec,nosuid,nodev,noatime,nodiratime 0 0""\n""tmpfs /var/log tmpfs defaults,nodev,noatime,nodiratime 0 0""\n""/tmp /var/tmp bind bind 0 0""\n""tmpfs /home/$nombre/.cache tmpfs defaults,nodev,noatime,nodiratime 0 0""\n""192.168.100.10:/var/cache/apt/archives /var/cache/apt/archives nfs user,exec""\n""192.168.100.10:/home/server /home/server nfs user,exec" >> /etc/fstab
+sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=""/GRUB_CMDLINE_LINUX_DEFAULT="elevator=noop panic=10"/g' /etc/default/grub
+update-grub2
+sed -i 's/Port 22/Port 2222/g' /etc/ssh/sshd_config
+sed -i 's/LoginGraceTime 120/LoginGraceTime 20/g' /etc/ssh/sshd_config
+sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
+sed -i 's/\#MaxStartups 10:30:60/MaxStartups 2/g' /etc/ssh/sshd_config
+echo -e "MaxAuthTries 2""\n""AllowUsers "server"""\n""AddressFamily inet""\n""UseDNS no" >> /etc/ssh/sshd_config
+
+falta configurar ssh para las llaves publicas
+
+echo "vhost_net" >> /etc/modules
+echo -e "#!/bin/bash""\n""### BEGIN INIT INFO""\n""# Provides:          defaultdaemon""\n""# Required-Start:    $remote_fs $syslog""\n""# Required-Stop:     $remote_fs $syslog""\n""# Default-Start:     2 3 4 5""\n""# Default-Stop:      0 1 6""\n""# Short-Description: inicia iptables""\n""# Description:       iptables""\n""### END INIT INFO""\n""echo 1 > /sys/kernel/mm/ksm/run""\n""echo 200 > /sys/kernel/mm/ksm/sleep_millisecs""\n""echo always > /sys/kernel/mm/transparent_hugepage/enabled""\n""echo 20000 > /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan""\n""echo 20000 > /sys/kernel/mm/ksm/pages_to_scan""\n" >> /etc/init.d/iptables
+chmod -v +x /etc/init.d/iptables
+update-rc.d iptables start 90 2 3 4 5 .
+apt-get update
+apt-get -q -f -y --force-yes install watchdog libaio1 nfs-common preload prelink
+
+configuracion de watch dog
+
+apt-get -q -f -y --force-yes dist-upgrade
+apt-get clean
+apt-get autoclean
+exit 0

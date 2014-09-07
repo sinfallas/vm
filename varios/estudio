@@ -1,0 +1,165 @@
+replicar repositorios en local para actualizar las vm
+
+-----------------------------------------------------
+
+-chardev socket,id=unix_socket1,path=/tmp/unix_socket1,server
+-chardev socket,id=gestion,path=/tmp/gestion,server
+
+
+kvm-spice -machine pc-1.2,accel=kvm,kernel_irqchip=on,kvm_shadow_mem=256M -uuid 64e4c61e-ec6c-45e5-a42b-d5f43271f6c1 -cpu host -name gestion -spice disable-ticketing,disable-copy-paste,ipv4,port=9551 -vga std -enable-kvm -daemonize -balloon virtio,addr=0x9 -pidfile /run/gestion.pid -runas sinfallas -nodefaults -watchdog i6300esb -watchdog-action reset -drive file=$imgdir/gestion.img,aio=native,cache=writeback,format=raw,if=virtio,index=0,media=disk -drive file=$imgdir/swap.img,aio=native,cache=writeback,format=raw,if=virtio,index=1,media=disk -boot c -m 780 -k es -localtime -net nic,vlan=0,name=eth0,model=virtio,macaddr=54:52:00:DF:3B:D9 -net vde,vlan=0,sock=/tmp/switch3/ -net nic,vlan=1,name=eth1,model=virtio,macaddr=54:52:00:2E:1E:9D -net vde,vlan=1,sock=/tmp/switch1/ -net nic,vlan=2,name=eth2,model=virtio,macaddr=54:52:00:6E:6A:66 -net vde,vlan=2,sock=/tmp/switch2/ -serial pty /dev/ttyS0
+
+nc -U /tmp/gestion.sock
+
+
+
+-chardev socket,path=/tmp/gestion.sock,server,nowait,id=gestion -device virtio-serial -device virtserialport,chardev=gestion,name=gestion
+
+
+
+GRUB_TERMINAL=serial
+GRUB_SERIAL_COMMAND="serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1"
+GRUB_CMDLINE_LINUX_DEFAULT=""
+GRUB_CMDLINE_LINUX="text console=tty0 console=ttyS0,115200n8"
+
+----------------------------------
+
+-device virtio-serial-pci -device virtserialport,chardev=spicechannel0 -chardev spicevmc,id=spicechannel0,name=vdagent
+
+------------------------------------
+
+iptables -A INPUT -p tcp --syn -m limit --limit 1/s --limit-burst 4 -j DROP
+
+iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+--------------------------
+
+http://www.igniterealtime.org/projects/openfire/
+
+----------------------
+
+firewall
+
+echo 10 > /proc/sys/vm/vfs_cache_pressure
+# 100 is the default value. 
+# Then you can limit the maximum amount of ram used by each app:
+echo 8192 > /proc/sys/vm/max_map_count. 
+
+----------------------------------
+
+echo 8192 > /sys/block/mmcblk0/queue/max_sectors_kb
+echo 8192 > /sys/block/mmcblk1/queue/max_sectors_kb
+echo 0 > /sys/block/mmcblk0/queue/iosched/slice_idle
+echo 0 > /sys/block/mmcblk1/queue/iosched/slice_idle
+echo 160 > /sys/block/mmcblk0/queue/iosched/quantum
+echo 160 > /sys/block/mmcblk1/queue/iosched/quantum
+echo 800 > /sys/block/mmcblk0/queue/iosched/fifo_expire_sync
+echo 800 > /sys/block/mmcblk1/queue/iosched/fifo_expire_sync
+echo 180 > /sys/block/mmcblk0/queue/iosched/fifo_expire_async
+echo 180 > /sys/block/mmcblk1/queue/iosched/fifo_expire_async
+echo 1 > /sys/block/mmcblk0/queue/iosched/back_seek_penalty 
+echo 1 > /sys/block/mmcblk1/queue/iosched/back_seek_penalty
+
+------------------------------------
+
+# Wie alt muessen "dirty changes" sein damit sie weg geschrieben werden
+# Sinnvollerweise vm.dirty_expire_centisecs = vm.dirty_writeback_centisecs
+echo 1250 > /proc/sys/vm/dirty_expire_centisecs
+
+# Wie viel Prozent das RAMS duerfen von einem Prozess mir "dirty changes"  
+# gefuellt
+# sein bevor der Prozess gezwungen wird diese Aenderungen zu schreiben 40:10
+echo 10 > /proc/sys/vm/dirty_ratio
+
+# Diese aktiviert oder deaktiviert die Toetung der OOM-Triggerung Aufgabe in
+# Out-of-Memory-Situationen. Verbessert die Stabilität.
+echo 1 > /proc/sys/vm/oom_kill_allocating_task
+
+# default 22
+echo 30 > /proc/sys/vm/lowmem_reserve_ratio
+
+# vm.overcommit_memory (0=default, 1=malloc always succeeds(?!?), 2=strict 
+overcommit)
+# vm.overcommit_ratio (50=default, I used 100)
+echo 2 > /proc/sys/vm/overcommit_memory
+echo 100 > /proc/sys/vm/overcommit_ratio
+
+# default 5
+echo 2 > /proc/sys/vm/page-cluster
+
+# min free ram
+echo 512 > /proc/sys/vm/min_free_kbytes
+
+# max ram for an app
+echo 8192 > /proc/sys/vm/max_map_count
+
+# default 250 32000 32 128
+# 4096 512000 1600 2048
+# 500 512000 64 2048
+echo 4096 512000 1600 2048 > /proc/sys/kernel/sem
+
+# default 128
+echo 16 > /sys/block/sda/queue/nr_requests
+echo 16 > /sys/block/sdb/queue/nr_requests
+
+echo 8192 > /sys/block/sda/queue/read_ahead_kb
+echo 8192 > /sys/block/sdb/queue/read_ahead_kb 
+
+# Set Readahead to a higher value
+# Default: 256
+blockdev --setfra 8192 /dev/sda
+blockdev --setfra 8192 /dev/sdb
+
+# default 512
+echo 8192 > /sys/block/sda/queue/max_sectors_kb
+echo 8192 > /sys/block/sdb/queue/max_sectors_kb
+
+------------------------------------------
+
+echo cfq > /sys/block/sda/queue/scheduler
+echo 10000 > /sys/block/sda/queue/iosched/fifo_expire_async
+echo 250 > /sys/block/sda/queue/iosched/fifo_expire_sync
+echo 80 > /sys/block/sda/queue/iosched/slice_async
+echo 1 > /sys/block/sda/queue/iosched/low_latency
+echo 6 > /sys/block/sda/queue/iosched/quantum
+echo 5 > /sys/block/sda/queue/iosched/slice_async_rq
+echo 3 > /sys/block/sda/queue/iosched/slice_idle
+echo 100 > /sys/block/sda/queue/iosched/slice_sync
+hdparm -q -M 254 /dev/sda
+
+------------------------------------------------
+
+acpi_osi=Linux apic lapic numa=on clocksource=jiffies
+
+-------------------
+
+console=ttys0,115200n8
+
+--------------------
+
+ServerAliveInterval establece el intervalo (en segundos) luego del cual, en caso de no recibir respuesta desde el servidor, ssh volverá a enviar un mensaje solicitando una respuesta.
+
+
+En el cliente
+Para que los cambios tengan efectos para todos los usuarios hay que modificar el archivo  /etc/ssh/ssh_config. En cambio, si querés que los cambios sólo tengan efecto para tu usuario, modificá el archivo ~/.ssh/config.
+
+Agregá lo siguiente en el archivo de configuración de SSH:
+
+Host *
+    ServerAliveInterval 300
+    ServerAliveCountMax 3
+
+
+
+En el servidor
+Para que sea el servidor quien mantenga vivas las conexiones con todos los clientes, agregá lo siguiente en el archivo /etc/ssh/sshd_config:
+
+ServerAliveInterval 300
+ServerAliveCountMax 3
+
+
+Esta configuración hace que el cliente/servidor envíe un mensaje a la contraparte cada 300 segundos (5 minutos) y se dé por vencido a la 3 oportunidad si no ha recibido respuesta alguna.
+
+----------------------------
+
+dpipe vde_plug /tmp/switch = ssh host2 vde_plug /tmp/switch
+

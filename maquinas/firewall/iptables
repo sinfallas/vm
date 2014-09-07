@@ -1,0 +1,137 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          iptables
+# Required-Start:
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: inicia iptables
+# Description:       reglas para iptables
+### END INIT INFO
+
+#limpieza
+iptables -F
+iptables -X
+iptables -Z
+iptables -t nat -F
+
+#estandar
+#desactivar para actualizar
+#iptables -P INPUT DROP
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD ACCEPT
+#iptables -t nat -P PREROUTING REJECT
+#iptables -t nat -P POSTROUTING REJECT
+
+#acceso local
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -i eth1 -p UDP --dport 53 -j ACCEPT
+iptables -A INPUT -i eth1 -p TCP --dport 53 -j ACCEPT
+iptables -A INPUT -i eth2 -p UDP --dport 53 -j ACCEPT
+iptables -A INPUT -i eth2 -p TCP --dport 53 -j ACCEPT
+iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o eth0 -d 0.0.0.0/0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o eth0 -d 0.0.0.0/0 -j MASQUERADE
+echo "1" > /proc/sys/net/ipv4/ip_forward
+
+#icmp
+echo "1" > /proc/sys/net/ipv4/icmp_echo_ignore_all
+echo "1" > /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts
+iptables -N ICMP_NON
+iptables -F ICMP_NON
+iptables -A ICMP_NON -p icmp --icmp-type redirect -j DROP
+iptables -A ICMP_NON -p icmp --icmp-type router-advertisement -j DROP
+iptables -A ICMP_NON -p icmp --icmp-type router-solicitation -j DROP
+iptables -A ICMP_NON -p icmp --icmp-type address-mask-request -j DROP
+iptables -A ICMP_NON -p icmp --icmp-type address-mask-reply -j DROP
+
+#flood
+iptables -N flood
+iptables -F flood
+iptables -A flood -m limit --limit 30/second --limit-burst 60 -j RETURN
+iptables -A flood -m limit --limit 30/second --limit-burst 60 -j LOG --log-prefix "flood: "
+iptables -A flood -j DROP
+
+#fake
+iptables -N PKT_FAKE
+iptables -F PKT_FAKE
+iptables -A PKT_FAKE -m state --state INVALID -j DROP
+iptables -A PKT_FAKE -p tcp ! --syn -m state --state NEW -j DROP
+iptables -A PKT_FAKE -f -j DROP
+
+#scan
+iptables -N FLAG_SCAN
+iptables -F FLAG_SCAN
+iptables -A FLAG_SCAN -p tcp --tcp-flags SYN,FIN SYN,FIN -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags SYN,RST SYN,RST -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags ALL FIN -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags SYN,FIN,PSH SYN,FIN,PSH -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags SYN,FIN,RST SYN,FIN,RST -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags SYN,FIN,RST,PSH SYN,FIN,RST,PSH -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags ALL ACK,RST,SYN,FIN -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags ALL NONE -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags ALL ALL -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags ALL FIN,URG,PSH -j DROP
+iptables -A FLAG_SCAN -p tcp --tcp-flags ALL SYN,RST,ACK,FIN,URG -j DROP
+
+#lamp
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 25 -j DNAT --to 192.168.100.2:25
+#iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to 192.168.100.2:80
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j DNAT --to 192.168.100.2:443
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 465 -j DNAT --to 192.168.100.2:465
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 10022 -j DNAT --to 192.168.100.10:2222
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 3306 -j DNAT --to 192.168.100.2:3306
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 5432 -j DNAT --to 192.168.100.2:5432
+
+#samba
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 137 -j DNAT --to 192.168.100.3:137
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 138 -j DNAT --to 192.168.100.3:138
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 139 -j DNAT --to 192.168.100.3:139
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 445 -j DNAT --to 192.168.100.3:445
+#iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 10023 -j DNAT --to 192.168.100.3:2222
+
+#mail
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 110 -j DNAT --to 192.168.100.4:110
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 143 -j DNAT --to 192.168.100.4:143
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 465 -j DNAT --to 192.168.100.4:465
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 993 -j DNAT --to 192.168.100.4:993
+#iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 10024 -j DNAT --to 192.168.100.4:2222
+
+#dns
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to 192.168.100.5:53
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to 192.168.100.5:53
+#iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 10025 -j DNAT --to 192.168.100.5:2222
+
+#pxe
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 67 -j DNAT --to 192.168.100.6:67
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 69 -j DNAT --to 192.168.100.6:69
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 4011 -j DNAT --to 192.168.100.6:4011
+#iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 10026 -j DNAT --to 192.168.100.6:2222
+
+#asterisk
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 2727 -j DNAT --to 192.168.100.7:2727
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 4569 -j DNAT --to 192.168.100.7:4569
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 5036 -j DNAT --to 192.168.100.7:5036
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 5060 -j DNAT --to 192.168.100.7:5060
+#iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 10027 -j DNAT --to 192.168.100.7:2222
+#iptables -t nat -A PREROUTING -i eth0 -p udp --dport 11000:20000 -j DNAT --to 192.168.100.7:10001:20000
+
+#vpn
+#iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 10028 -j DNAT --to 192.168.100.8:2222
+
+#squid
+#iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 10029 -j DNAT --to 192.168.100.9:2222
+
+#poo
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 3346 -j DNAT --to 10.0.0.2:3346
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 6000 -j DNAT --to 10.0.0.2:6000
+#iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 10050 -j DNAT --to 10.0.0.2:2222
+
+#comentar para actualizar
+#iptables -A INPUT -s 0.0.0.0/0 -i eth0 -p tcp --dport 1:64000 -j DROP
+#iptables -A INPUT -s 0.0.0.0/0 -i eth0 -p udp --dport 1:64000 -j DROP
+
+echo "1" > /sys/kernel/mm/ksm/run
+echo "399" > /sys/kernel/mm/ksm/sleep_millisecs
+echo "always" > /sys/kernel/mm/transparent_hugepage/enabled
+echo 20000 > /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan
+echo 20000 > /sys/kernel/mm/ksm/pages_to_scan

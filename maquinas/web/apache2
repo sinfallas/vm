@@ -1,0 +1,52 @@
+#!/bin/bash
+aptitude -q -f -y --force-yes install apache2 libapache2-mod-auth-mysql apache2-utils libxml2 libxml2-dev libxml2-utils libaprutil1 libaprutil1-dev libapache-mod-security libapache2-mod-evasive libapache2-mod-perl2 php5 php5-cgi libapache2-mod-fcgid phpmyadmin memcached php5-memcache php5-curl php5-gd php5-geoip php5-suhosin php5-cli php5-idn php5-pspell php5-snmp php5-recode php5-ming php5-imagic libapache2-mod-python php pear socket
+a2enmod auth_mysql
+a2enmod headers
+a2enmod rewrite
+a2dismod expires
+a2enmod deflate
+echo -e "AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/x-javascript application/javascript application/ecmascript""\n""application/rss+xml text/x-js""\n""BrowserMatch ^Mozilla/4 gzip-only-text/html""\n""BrowserMatch ^Mozilla/4\.0[678] no-gzip""\n""BrowserMatch \bMSIE !no-gzip !gzip-only-text/html" >> /etc/apache2/mods-enabled/deflate.conf
+a2enmod cache
+htcacheclean -d30 -n -t -p /var/cache/apache2/mod_disk_cache -l 100M -i
+echo -e "<IfModule mod_mem_cache.c>""\n""CacheEnable mem /""\n""MCacheSize 4096""\n""MCacheMaxObjectCount 100""\n""MCacheMinObjectSize 1""\n""MCacheMaxObjectSize 2048""\n""</IfModule>" >> /etc/apache2/mods-available/mem_cache.conf
+a2enmod cache
+a2enmod mem_cache
+a2enmod proxy
+a2enmod proxy_balancer
+a2enmod proxy_http
+a2enmod status
+ln -s /usr/lib/x86_64-linux-gnu/libxml2.so.2 /usr/lib/libxml2.so.2
+mv /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+
+- sudo nano /etc/modsecurity/modsecurity.conf
+- Activar
+SecRuleEngine On
+- Editar
+SecRequestBodyLimit 16384000
+SecRequestBodyInMemoryLimit 16384000
+
+a2enmod mod-security
+mkdir /var/log/mod_evasive
+chown www-data:www-data /var/log/mod_evasive/
+echo -e "<ifmodule mod_evasive20.c>""\n""DOSHashTableSize 3097""\n""DOSPageCount 2""\n""DOSSiteCount 50""\n""DOSPageInterval 1""\n""DOSSiteInterval 1""\n""DOSBlockingPeriod 10""\n""DOSLogDir /var/log/mod_evasive""\n""DOSEmailNotify xombra.xom@gmail.com""\n""DOSWhitelist 127.0.0.1""\n""</ifmodule>" >> /etc/apache2/mods-available/mod-evasive.conf
+a2enmod mod-evasive
+a2dismod php
+apache2-mpm-worker
+echo -e "AddHandler cgi-script .cgi""\n""<Files ~ “\.pl$”>""\n""Options +ExecCGI""\n""</Files>""\n""<Files ~ “\.cgi$”>""\n""Options +ExecCGI""\n""</Files>" >> /etc/apache2/apache2.conf
+wget https://dl-ssl.google.com/dl/linux/direct/mod-spdy-beta_current_amd64.deb
+dpkg -i mod-spdy-*.deb
+echo -e "<Location />""\n""AddHandler fcgid-script .php""\n""Options +ExecCGI""\n""FcgidWrapper /usr/bin/php-cgi .php""\n""</Location>""\n""SpdyEnabled on" >> /etc/httpd/conf/httpd.conf 
+apache2ctl -M
+echo -e "AddHandler mod_python .py""\n""PythonHandler mod_python.publisher""\n""PythonDebug On""\n""AddHandler application/x-httpd-php .php5 .php4 .php .php3 .phtml""\n""AddType application/x-httpd-php .php5 .php4 .php .php3 .phtml" >> /etc/apache2/http.conf
+ln -s /usr/share/phpmyadmin /var/www
+aptitude -q -f -y --force-yes install openssl
+openssl genrsa -des3 -out server.key 1024
+cp server.key server.key.passphrase
+openssl rsa -in server.key.passphrase -out server.key
+openssl req -new -x509 -nodes -sha1 -days 365 /-key server.key -out server.crt
+openssl req -new -key server.key -out server.csr
+apt-get install mod_ssl
+a2ensite default-ssl
+a2enmod ssl
+
+

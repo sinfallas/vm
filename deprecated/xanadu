@@ -1,0 +1,205 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          xanadu
+# Required-Start:
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: xanadu start/stop script
+# Description:       xanadu start/stop script, elaborado por sinfallas
+### END INIT INFO
+source variables
+case "$1" in
+	start)
+	    if [[ -f $lock ]]; then
+	    	echo "Error: El sistema se esta ejecutando desde: "`cat $lock`""
+	    else
+	    	echo "$(date +%d/%m/%Y-%r)" > $lock
+		source inicio
+	    	echo "$(date +%d/%m/%Y-%r) Arranque Finalizado" >> $log
+	    fi
+	    exit 0
+	    ;;
+        pause)
+            if [[ -f $lock ]]; then
+	    	hacer=-19
+	    	echo "$(date +%d/%m/%Y-%r) Pausa del sistema" >> $log
+	    else
+	    	echo "El sistema NO se esta ejecutando"
+		echo "$(date +%d/%m/%Y-%r) Intento fallido de pausar el sistema porque el sistema NO se esta ejecutando" >> $log
+	    exit 0
+	    fi
+	    ;;
+	unpause)
+	    if [[ -f $lock ]]; then
+	    	hacer=-18
+	    	echo "$(date +%d/%m/%Y-%r) Se reanuda del sistema" >> $log
+	    else
+	    	echo "El sistema NO se esta ejecutando"
+		echo "$(date +%d/%m/%Y-%r) Intento fallido de reanudar el sistema porque el sistema NO se esta ejecutando" >> $log
+	    exit 0
+	    fi
+	    ;;	
+	stop)
+	    if [[ -f $lock ]]; then
+	    	hacer=-9
+	    	stop qemu-kvm
+	    	rmmod virtio_balloon
+		ifdown eth0
+		tunctl -d tap0
+		ifconfig br0 down
+		brctl delbr br0 
+		ifup eth0
+	    	rm -f $lock
+	    	echo "$(date +%d/%m/%Y-%r) Apagado de EMERGENCIA del sistema" >> $log
+	    else
+	    	echo "El sistema NO se esta ejecutando"
+		echo "$(date +%d/%m/%Y-%r) Apagado de EMERGENCIA fallido porque el sistema NO se esta ejecutando" >> $log
+	    exit 0
+	    fi
+	    ;;
+	restart)
+	    if [[ -f $lock ]]; then
+	    	hacer=-9
+	    	stop qemu-kvm
+	    	rmmod virtio_balloon
+		ifdown eth0
+		tunctl -d tap0
+		ifconfig br0 down
+		brctl delbr br0 
+		ifup eth0
+	    	rm -f $lock
+		echo "$(date +%d/%m/%Y-%r) Reinicio del sistema" >> $log
+	    else
+	    	echo "El sistema NO se esta ejecutando"
+		echo "$(date +%d/%m/%Y-%r) Intento fallido de reinicio del sistema porque el sistema NO se esta ejecutando" >> $log
+	    exit 0
+	    fi
+	    ;;
+	status)
+	    if [[ -f $lock ]]; then
+		echo "$(date +%d/%m/%Y-%r) ========== Verificacion Iniciada" >> $log
+		for (( n=1; n<=$vmtotal; n++ ))
+		do
+		ciclo=`echo $!vm$n`
+		ciclo2=`echo $!run$n`
+		ciclo3=`echo $!vmc$n`
+		if [[ ${!ciclo2} = 1 ]]; then
+			if [[ -f $pid/${!ciclo}.pid ]]; then
+			echo "$(date +%d/%m/%Y-%r) ${!ciclo} Esta programada para su inicio y se encuentra en ejecucion" >> $log
+			else
+			echo "$(date +%d/%m/%Y-%r) ${!ciclo} Esta programada para su inicio pero NO se encuentra en ejecucion" >> $log
+			${!ciclo3}
+			$tiempo
+			echo "$(date +%d/%m/%Y-%r) ${!ciclo} Puesta en marcha despues de presentar una falla" >> $log
+			fi
+	    	else
+			echo "$(date +%d/%m/%Y-%r) ${!ciclo} NO esta programada para su inicio" >> $log
+	    	fi
+	    	done
+	    	cat $log
+	    else
+	    	echo "$(date +%d/%m/%Y-%r) No se ejecuta la verificacion porque el sistema NO esta en ejecucion " >> $log
+		cat $log
+	    fi
+	    exit 0	    
+	    ;;
+	install)
+	    if [[ -f /usr/bin/xanadu-install ]]; then
+	    echo "El sistema fue instalado en: "`cat /usr/bin/xanadu-install`""
+	    else
+	    echo -e "vm.swappiness = 10""\n""vm.dirty_background_ratio = 15""\n""vm.dirty_ratio = 25""\n""vm.vfs_cache_pressure = 40""\n""vm.dirty_writeback_centisecs = 1500""\n""vm.mmap_min_addr = 4096""\n""kernel.shmmni = 4096""\n""kernel.shmall = 536870912""\n""kernel.shmmax = 5368709117""\n""# kernel.sched_autogroup_enabled = 1""\n""# kernel.sched_rt_runtime_us = 950000""\n""kernel.threads-max = 98006""\n""net.ipv6.conf.all.disable_ipv6 = 1""\n""net.ipv6.conf.default.disable_ipv6 = 1""\n""net.ipv6.conf.lo.disable_ipv6 = 1""\n""net.ipv6.conf.all.accept_redirects = 0""\n""net.ipv6.conf.all.accept_source_route = 0""\n""net.ipv4.conf.default.rp_filter=1""\n""net.ipv4.conf.all.rp_filter=1""\n""net.ipv4.conf.all.accept_redirects = 0""\n""net.ipv4.conf.all.send_redirects = 0""\n""net.ipv4.conf.all.accept_source_route = 0""\n""net.ipv4.tcp_timestamps = 0""\n""net.ipv4.tcp_sack = 1""\n""net.ipv4.tcp_window_scaling = 1""\n""net.core.rmem_max = 16777216""\n""net.core.wmem_max = 16777216""\n""net.ipv4.tcp_rmem = 4096 87380 16777216""\n""net.ipv4.tcp_wmem = 4096 65536 16777216""\n""net.ipv4.tcp_no_metrics_save = 1""\n""net.core.netdev_max_backlog = 2500""\n""fs.file-max = 307615""\n""fs.aio-max-nr = 1048576""\n""net.ipv4.tcp_moderate_rcvbuf = 1""\n""net.ipv4.tcp_syncookies=1""\n""kernel.kptr_restrict = 1""\n""fs.file-max = 307615""\n""fs.aio-max-nr = 1048576" >> /etc/sysctl.conf
+	    sysctl -p
+	    echo "* hard nproc 1000" >> /etc/security/limits.conf
+	    echo -e "/dev/sda {""\n"" lookahead = on""\n"" write_cache = on""\n""}" >> /etc/hdparm.conf
+	    echo 'INTEL_BATCH="1"' >> /etc/environment
+	    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/GRUB_CMDLINE_LINUX_DEFAULT="elevator=deadline drm.vblankoffdelay=1 i915.i915_enable_fbc=1 i915.i915_enable_rc6=1 i915.lvds_downclock=1 panic=10 quiet splash"/g' /etc/default/grub
+	    update-grub2
+	    sed -i 's/AVAHI_DAEMON_DETECT_LOCAL=1/AVAHI_DAEMON_DETECT_LOCAL=0/g' /etc/default/avahi-daemon
+	    sed -i 's/127.0.0.1	localhost/127.0.0.1	localhost $nombre/g' /etc/hosts
+	    echo -e "#! /bin/sh""\n""### BEGIN INIT INFO""\n""# Provides:          modulos""\n""# Required-Start:""\n""# Required-Stop:""\n""# Default-Start:     2 3 4 5""\n""# Default-Stop:""\n""# Short-Description: Limpieza""\n""### END INIT INFO""\n""echo always > /sys/kernel/mm/transparent_hugepage/enabled""\n""echo 20000 > /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan""\n""echo 20000 > /sys/kernel/mm/ksm/pages_to_scan""\n""stop avahi-daemon""\n""stop cups""\n""# stop bluetooth""\n""stop kdm""\n""stop qemu-kvm""\n""stop winbind""\n""stop munin-node""\n""stop ssh""\n""stop uml-utilities""\n""stop openvswitch-switch""\n""/etc/init.d/xend stop""\n""/etc/init.d/xcp-squeezed stop""\n""/etc/init.d/xcp-xapi stop""\n""/etc/init.d/xcp-fe stop""\n""/etc/init.d/xcp-v6d stop""\n""/etc/init.d/xcp-networkd stop""\n""rmmod ip6table_filter""\n""rmmod ip6_tables""\n""stop modemmanager""\n""rmmod rfcomm""\n""rmmod bnep""\n""rmmod bluetooth""\n""rmmod msdos""\n""stop libvirt-bin""\n""#ifconfig wlan0 mtu 1492""\n""#ifconfig eth0 mtu 1492""\n""#ifconfig br0 mtu 1492""\n""#ifconfig tap0 mtu 1492""\n""sysctl -p""\n""exit 0" >> /etc/init.d/modulos
+	    chmod -v +x /etc/init.d/modulos
+	    update-rc.d modulos start 96 2 3 4 5 .
+	    add-apt-repository -y ppa:jacob/virtualisation
+	    apt-get update
+	    apt-get -f -y --force-yes install linux-lowlatency apparmor-utils ssh kvm qemu-kvm-extras qemu qemu-kvm qemu-kvm-spice grub-firmware-qemu qemu-system qemu-user qemuctl vde2 spice-client-gtk python-spice-client-gtk randomize-lines virt-manager virt-goodies virt-viewer uml-utilities socat
+	    sed -i 's/\#   ForwardX11 no/ForwardX11 yes/g' /etc/ssh/ssh_config
+	    sed -i 's/Port 22/Port 2222/g' /etc/ssh/sshd_config
+	    sed -i 's/LoginGraceTime 120/LoginGraceTime 20/g' /etc/ssh/sshd_config
+	    sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
+	    sed -i 's/\#MaxStartups 10:30:60/MaxStartups 2/g' /etc/ssh/sshd_config
+	    echo -e "MaxAuthTries 2""\n""AllowUsers "$nombre"\n""X11UseLocalhost yes""\n""AddressFamily inet""\n""UseDNS no" >> /etc/ssh/sshd_config
+	    addgroup kvm
+	    adduser $nombre kvm
+	    addgroup vde2-net
+	    adduser $nombre vde2-net
+	    mkdir -p $casa/isos
+	    mkdir -p $casa/kvm
+	    mkdir -p /var/lib/libvirt/images/nas
+	    setcap cap_net_admin=ei /usr/bin/qemu-system-x86_64
+	    echo cap_net_admin $nombre >> /etc/security/capability.conf
+	    sed -i 's/VHOST_NET_ENABLED=0/VHOST_NET_ENABLED=1/g' /etc/default/qemu-kvm
+	    echo "$(date +%d/%m/%Y-%r)" > /usr/bin/xanadu-install
+	    echo "$(date +%d/%m/%Y-%r) Instalacion de $0 finalizada!!!" >> $log
+	    echo "Instalacion de $0 finalizada!!!"
+	    fi	    
+	    exit 0
+	    ;;	
+	*)
+            echo "USO: $0 {start|stop|restart|pause|unpause|status|install}"
+	    exit 0
+	    ;;
+esac
+echo "Accion $1 Switch Virtuales"
+if [[ -f $pid/switch1.pid ]]; then
+kill $hacer "`cat $pid/switch1.pid`"
+fi
+if [[ -f $pid/switch2.pid ]]; then
+kill $hacer "`cat $pid/switch2.pid`"
+fi
+#-------------------------------------
+#hacer un for para esta parte
+echo "Accion $1 Maquinas Virtuales"
+if [[ -f $pid/$vm11.pid ]]; then
+kill $hacer "`cat $pid/$vm11.pid`"
+fi
+if [[ -f $pid/$vm10.pid ]]; then
+kill $hacer "`cat $pid/$vm10.pid`"
+fi
+if [[ -f $pid/$vm9.pid ]]; then
+kill $hacer "`cat $pid/$vm9.pid`"
+fi
+if [[ -f $pid/$vm8.pid ]]; then
+kill $hacer "`cat $pid/$vm8.pid`"
+fi
+if [[ -f $pid/$vm7.pid ]]; then
+kill $hacer "`cat $pid/$vm7.pid`"
+fi
+if [[ -f $pid/$vm6.pid ]]; then
+kill $hacer "`cat $pid/$vm6.pid`"
+fi
+if [[ -f $pid/$vm5.pid ]]; then
+kill $hacer "`cat $pid/$vm5.pid`"
+fi
+if [[ -f $pid/$vm4.pid ]]; then
+kill $hacer "`cat $pid/$vm4.pid`"
+fi
+if [[ -f $pid/$vm3.pid ]]; then
+kill $hacer "`cat $pid/$vm3.pid`"
+fi
+if [[ -f $pid/$vm2.pid ]]; then
+kill $hacer "`cat $pid/$vm2.pid`"
+fi
+if [[ -f $pid/$vm1.pid ]]; then
+kill $hacer "`cat $pid/$vm1.pid`"
+fi
+if [[ $1 = stop ]]; then
+echo "Limpiando Entorno"
+rm -f $pid/*.pid
+fi
+if [[ $1 = restart ]]; then
+rm -f $pid/*.pid
+source inicio
+echo "$(date +%d/%m/%Y-%r) Reinicio finalizado" >> $log
+fi
+exit 0

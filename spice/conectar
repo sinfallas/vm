@@ -1,0 +1,4 @@
+#!/bin/bash
+# elaborado por sinfallas
+#SUBJECT=`openssl x509 -noout -text -in server-cert.pem | grep Subject: | cut -f 10- -d " "`
+spicec -h 127.0.0.1 -s 9551 --secure-channels all --ca-file /home/sinfallas/.spicec/spice_truststore.pem --host-subject C=ve,L=valencia,O=viser,CN=viser

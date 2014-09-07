@@ -1,0 +1,288 @@
+tmux para sincronizar las vm
+
+------------------------------------
+
+crear perfil de apparmor para todo xanadu
+
+--------------------------------
+
+lxc dentro de las vm para aumentar seguridad
+
+--------------------------------
+
+el kernel y el initram se carguen desde el mismo .img o directorio
+
+----------------------------
+
+script para crear vm
+
+----------------------
+
+agregar psad y fwssnort a la vm firewall
+
+-----------------------
+
+GRUB: acpi=ht
+
+script que uso para gestionar los parametros tuneables del elevador deadline:
+
+archivo: /etc/optimicedisk.sh (convocado desde /etc/rc.local)
+
+#!/bin/bash
+# script para optimizar el acceso a disco de sistemas en noop o deadline
+# autor: jesus lara jesuslara@gmail.com
+DISKS=( sda sdb )
+
+# parameters
+SCHEDULER="deadline"
+ROTATIONAL=0
+QUEUEDEPTH=975
+RQAFFINITY=0
+BLOCKDEV=16384
+
+# iteration
+for DISK in $DISKS
+do
+        echo "change I/O elevator to $SCHEDULER"
+        echo $SCHEDULER > /sys/block/$DISK/queue/scheduler
+        echo "optimice server disk block size to $BLOCKDEV"
+        /sbin/blockdev --setra $BLOCKDEV /dev/$DISK
+        echo "set queue depth to $QUEUEDEPTH"
+        /bin/echo $QUEUEDEPTH > /sys/block/$DISK/queue/nr_requests
+        # turn off rotational (RAID/SSD/NAS/HBA related)
+        /bin/echo $ROTATIONAL > /sys/block/$DISK/queue/rotational
+        # read ahead and sectors read by disk
+        /bin/echo "8192" > /sys/block/$DISK/queue/read_ahead_kb
+        /bin/echo "4096" > /sys/block/$DISK/queue/max_sectors_kb
+        # fifo batch reduce seeks
+        /bin/echo 1 > /sys/block/$DISK/queue/iosched/fifo_batch
+        echo "set rq affinity to $RQAFFINITY"
+        /bin/echo 1 > /sys/block/$DISK/queue/rq_affinity
+
+        # enable write-caching
+        /sbin/hdparm -W1 /dev/$DISK
+done
+echo "done."
+
+Este es un server, con un RAID1 de dos discos SATA3, he apagado el "rotational", porque no es necesario decirle a los discos que hagan "rotational seek" ya que eso es algo que gestiona el RAID.
+
+Aunque hdparm está obsoleto, aún sirve para "encender" el caché del disco.
+
+Saludos!
+
+------------------
+
+# habilito el writeback-mode
+tune2fs -o journal_data_writeback /dev/sda2
+
+*  y el montaje:
+rw,,data=writeback,,errors=remount-ro
+
+--------------------
+
+shmmax es "cantidad de memoria máxima que un proceso puede obtener a partir de la memoria compartida", lo ideal no es poner un valor "a lo loco", sino:
+- servidores: 90% de la  RAM existente
+- workstations (cinelerra): 60/70% de la RAM existente
+
+Así, estas más que seguro que los procesos aprovecharán toda la RAM existente.
+
+NOTA: 0x7ffffffff en hexa significa 2147483647 en bytes, eso es cómo 2GB, para equipos con menos de 2GB de RAM, dicha directiva causará fallos de "no allocated memory" y volcados de pila de aplicaciones.
+
+----------------------
+
+usar sheepdog para los nas
+
+---------------------
+
+formatear archivos del NAS
+
+---------------------
+
+nuevas metricas
+
+--------------------
+
+hacer gui con bash
+
+---------------------
+
+script para crear VM
+
+--------------------
+
+instalar en lamp un database firewall
+
+--------------------
+
+agregar seguridad con cgroups
+
+--------------------
+
+migracion de kvm
+
+--------------------
+
+asegurar la conexion spice
+
+-----------------------------
+
+instalar roundcube para la vm mail
+
+------------------------------
+
+abrir estos puertos en firewall para la vm mail
+
+587 - 25- 110 - 465 - 143 - 8891 - 8892
+
+------------------------------
+
+se elimino -nodefaults en gestion para que kvm cree el hardware base y probar la terminal serial virtual
+
+-----------------------------
+
+buscar como hacer script con ssh
+
+-----------------------------
+
+buscar aplicaciones duplicadas, clamav, bind9, postfix
+
+web tiene postfix y hay que hacer que use el de la vm mail
+
+eliminar clamav en mail para usar el de gestion (ahorra memoria y ancho de banda)
+
+-----------------------------
+
+activar jumboframes con "mtu 9000" en todas las interfaces (da problemas con las metricas y cuelga los equipos)
+
+-----------------------------
+
+forward puertos sin usar al honeypot y limpiar cortafuegos
+
+----------------------------
+
+crear el NAS virtual en gestion y redirecionar todo el almacen de las vm via NFS
+
+----------------------------
+
+config rkhunter y clamav
+
+
+clamav debe estar en gestion y mail
+
+---------------------------
+
+snort
+
+------------------------------
+
+http://blog.desdelinux.net/instalar-un-servidor-de-xmpp-jabber-con-prosody/
+
+-------------------------------------
+
+usar xephyr con viser
+
+------------------------------------
+
+openldap (hay que pensarlo xq samba lo trae)
+
+---------------------------------
+
+configurar pxe para usar con spice
+
+----------------------------------
+
+eliminar acceso a sys_log
+
+http://manpages.ubuntu.com/manpages/natty/es/man2/syslog.2.html
+
+------------------------------------
+
+cron q limpia el /tmp cada 2 horas
+cron antirookit cada 24 horas
+
+añadir en cron el script  http://ow.ly/hJF0  para evitar sitios maliciosos usando
+
+feeds.dshield.org/block.txt
+spamhaus.org/drop/drop.lasso
+
+-------------------------------------
+
+eliminar tty en la vm
+
+Para reducir, entonces, el número de terminales virtuales sólo debemos abrir cada archivo con Gedit, de la siguiente forma a través de la terminal:
+
+sudo gedit /etc/init/ttyXX.conf
+
+    dijo:
+
+    # respawn
+    # exec /sbin/getty -8 38400 tty4
+
+----------------------------------
+nano httpd.conf
+
+ NameVirtualHost *:80
+   <VirtualHost *:80>
+       RewriteEngine On
+       RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+   </VirtualHost>
+--------------------------------
+
+maquina de gestion
+
+
+este equipo esta conectado al switch de la red virtual primaria (no tiene acceso a la red del honeypot), a su vez debe exister algun vinculo con la maquina host (todavia no se como establecerlo)
+
+
+la funcion principal de este equipo es el de servir de pasarela ssh hacia los demas equipos, esto se hace para impedir que tanto la maquina de firewall como la maquina host tengas acceso a la esos equipos, lo que significa que dichos equipos (ejemplo apache) no acepta conexiones desde otro IP o MAC que no corresponda con la de la maquina de gestion
+
+
+la conexion con el host se utiliza para gestionar las creacion o restauracion de las backup, esto se realizara mediante un comando planificado en gestion y que se pasara al host
+
+
+tambien puede utilizarce esa conexion con host para verificar la integridad de las VM mediante el script que sinfallas hizo, este script verifica la firma MD5 de los archivos de imagen de disco de las vm y la verificacion del proceso de cada una de la VM se realiza mediante APPARMOR (en la maquina host) y rootkin hunter en la maquina de gestion.
+
+
+en caso de que alguna de las VM resulte comprometida el sistema realizara una serie de proceso para tratar de levantar la VM
+
+
+1) en caso de que el equipo no responda el watchdog correspondiente reiniciara dicho equipo y la maquina de gestion realizara la alerta correspondiente
+2) en caso de que el equipo falle la verificacion de la firma md5 en su archivo de imagen, la maquina de gestion dara de baja dicho equipo y dara la orden al host para poner en linea una copia limpia de dicha maquina, al estar los datos alojados en el NAS virtual las posibles perdidas son minimizadas,
+3) en caso de que la maquina de firewall se vea comprometida, la de gestion puede eliminarla de la red y realizar la restauracion correspondiente; en caso de fallar puede dar la orden a la vm con menos carga de trabajo que tome el lugar del firewall y ademas siga cumpliendo su funcion principal
+
+
+la maquina de gestion hara un reporte de las fallas y posibles vectores de ataque a un servidor central (externo a las empresas y controlados por nosotros), esto nos permitira crear firmas de actualizacion y asi proteger a las demas plataformas con la experiencia ganada de falla y ataques
+
+
+el servidor central tambien hara notificaciones tipo push a las maquinas de gestion ubicadas en las diferentes plataformas, esto nos permite ahorrar ancho de banda ya que las maquinas dentro de cada una de las celulas de viser no deben utilizar el enlace a internet para comprobar nuevas versiones de software
+
+
+-------------------------------------------------------------------------------------------------------------
+modificaciones
+
+
+debido a la posibilidad de que la maquina de firewall pueda ser reemplazada por cualquera de los equipos (menos la de gestion) se necsitas instalar todos los componentes del firewall en la maquinas de la red
+
+-----------------------
+
+creacion del script de verificacion de PID mediante SSH (establecer numeros de PID manualmente)
+
+-------------------------
+
+hay que cambiar el programa de firewall actrual por el CFS ya que permite una adaptacion rapida a los ataques, tambien podemos utilizar SNORT
+
+---------------------------
+
+todas las alertas se realizan mediante correo electronico
+
+----------------------
+
+crear un volumen dedicado para las copia de seguridad
+
+
+================================================================================
+para estudiar
+
+
+crear un honeypot central, la funcion de dicho equipo sera la de redirigir un ataque masivo hacia una de las celulas de viser, esto se realizara luego de que la maquina de gestion haya redirigido el trafico al honeypot local y todos los intentos por bloquear el ataque hayan fallado (durante la redirecion al honeypot central la celula de viser sera incapaz de conectarse a internet; por lo tanto la alerta debe emitirse antes de realizar la redireccion) ; debe buscarse un proveedor que nos permita la instalacion de dicha plataforma ya que durante un ataque DDoS esta recibira el flujo de datos
+

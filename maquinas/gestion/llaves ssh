@@ -1,0 +1,29 @@
+apt-get -y install ssh nfs-common nfs-kernel-server 
+echo "ALL : ALL" >> /etc/hosts.allow
+echo "/home/server *(rw,insecure,sync)" >> /etc/exports
+sudo exportfs -r
+ssh-keygen -t dsa
+cd .ssh
+cat id_dsa.pub >> authorized_keys
+
+
+nano /etc/ssh/sshd_config
+
+StrictModes  no
+RSAAuthentication yes
+PubKeyAuthentication yes
+AuthorizedKeyfile %h/.ssh/authorized_keys
+PasswordAuthentication no
+UsePAM no
+
+-----------------------------------------
+
+slaves
+
+configurar los ip y nombres de todos los nodos con 
+sudo nano /etc/hosts 
+
+sudo apt-get -y install ssh nfs-common 
+
+echo "main:/home/server /home/server nfs user,exec" >> /etc/fstab 
+

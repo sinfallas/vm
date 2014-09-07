@@ -1,0 +1,18 @@
+#!/bin/bash
+#elaborado por sinfallas
+apt-get -s install lxc cloud-utils lsb-release debootstrap bridge-utils libvirt-bin
+
+echo cgroups cgroup /sys/fs/cgroup cgroup defaults 0 0 >> /etc/fstab
+
+mount -a
+
+sed -ie "s/.*GRUB_CMDLINE_LINUX=\"\(.*\)\"/GRUB_CMDLINE_LINUX=\"\1 cgroup_enable=memory swapaccount=1\"/" /etc/default/grub
+
+update-grub2
+
+grep cgroup /proc/self/mounts
+
+cgroup /sys/fs/cgroup cgroup rw,relatime,perf_event,blkio,net_cls,freezer,devices,memory,cpuacct,cpu,cpuset 0 0
+
+wget http://lxc-webpanel.github.com/tools/install.sh -O - | bash
+exit 0
