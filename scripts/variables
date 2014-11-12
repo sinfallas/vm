@@ -5,11 +5,11 @@ mkdir -p /run/xanadu
 clear
 else
 echo "El sistema no esta instalado, ejecute ./xanadu install"
-exit 0
+exit 1
 fi
 if [[ $USER != root ]]; then
 echo "Error: Debe tener privilegios de ROOT"
-exit 0
+exit 1
 fi
 #----------
 nombre="sinfallas"
