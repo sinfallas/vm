@@ -1,4 +1,16 @@
-commit 1d443712251b01ce56afa0089ab7c16a3225e3a1 (HEAD, origin/master, origin/HEAD, master)
+commit af7dfd575b06f33acfb882a47a66e8acb990f5ea (HEAD, origin/master, origin/HEAD, master)
+Author: sinfallas <sinfallas@gmail.com>
+Date:   Mon Nov 24 01:13:42 2014 -0430
+
+    * se eliminan los bios para respetar su licencia
+
+commit 22e4b5d53bd093af71a19e572fc5bec1e66b7a83
+Author: sinfallas <sinfallas@gmail.com>
+Date:   Mon Nov 24 01:13:02 2014 -0430
+
+    * changelog
+
+commit 1d443712251b01ce56afa0089ab7c16a3225e3a1
 Author: sinfallas <sinfallas@gmail.com>
 Date:   Mon Nov 24 01:12:44 2014 -0430
 
