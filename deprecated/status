@@ -1,5 +1,4 @@
 #!/bin/bash
-#elaborado por sinfallas
 source variables
 echo "$(date +%d/%m/%Y-%r) ========== Verificacion Iniciada" >> $log
 if [[ $run1 = 1 ]]; then

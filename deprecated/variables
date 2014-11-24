@@ -1,5 +1,4 @@
 #!/bin/bash
-#elaborado por sinfallas
 if [[ -f /usr/bin/xanadu-install ]]; then
 mkdir -p /run/xanadu
 clear

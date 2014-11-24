@@ -1,5 +1,4 @@
 #!/bin/bash
-#elaborado por sinfallas
 source variables
 echo "$(date +%d/%m/%Y-%r) ========== Inicio del sistema" >> $log
 ifconfig eth0 down

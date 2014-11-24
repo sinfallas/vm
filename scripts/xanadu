@@ -8,7 +8,6 @@
 # Short-Description: xanadu start/stop script
 # Description:       xanadu start/stop script, elaborado por sinfallas
 ### END INIT INFO
-#elaborado por sinfallas
 source variables
 case "$1" in
 	start)
