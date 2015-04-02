@@ -1,4 +1,16 @@
-commit 73ce8715cce3d6c32a82909686bb148281f36d21 (HEAD, origin/master, origin/HEAD, master)
+commit 15b160fb231d349e310448835e3625da36a17864 (HEAD, origin/master, origin/HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Thu Apr 2 12:46:44 2015 -0430
+
+    * se agregan los script viejos de la uam
+
+commit 390a8b24c7f2910954bf632ace8f5b71ce66a4a6
+Author: sinfallas <sinfallas@gmail.com>
+Date:   Thu Jan 8 00:48:16 2015 -0430
+
+    * changelog
+
+commit 73ce8715cce3d6c32a82909686bb148281f36d21
 Author: sinfallas <sinfallas@gmail.com>
 Date:   Thu Jan 8 00:47:21 2015 -0430
 
