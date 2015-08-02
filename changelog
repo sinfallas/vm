@@ -1,4 +1,17 @@
-commit 15b160fb231d349e310448835e3625da36a17864 (HEAD, origin/master, origin/HEAD, master)
+commit 698a75453dd3f0795eb5441a3ff582ab23289f0c (HEAD, origin/master, origin/HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Sat Aug 1 21:51:01 2015 -0430
+
+    * se agregan otras configuraciones
+    * coveralls
+
+commit 9fbcc94a9cbad354f628a6a09101f14698a6ab96
+Author: jose perez <sinfallas@gmail.com>
+Date:   Thu Apr 2 12:47:09 2015 -0430
+
+    * changelog
+
+commit 15b160fb231d349e310448835e3625da36a17864
 Author: jose perez <sinfallas@gmail.com>
 Date:   Thu Apr 2 12:46:44 2015 -0430
 
