@@ -1,10 +1,22 @@
-commit f9921c1aa95a69a97da5159cc10bacaf19631601 (HEAD, origin/master, origin/HEAD, master)
+commit 18321e9fd3f7442a4508b12798297da29fe32ef1 (HEAD, origin/master, origin/HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Mon Oct 12 13:25:13 2015 -0430
+
+    * update
+
+commit 35b16a2d585cfa6975e05017cb0678595e48b440
+Author: jose perez <sinfallas@gmail.com>
+Date:   Tue Oct 6 21:14:47 2015 -0430
+
+    * changelog
+
+commit f9921c1aa95a69a97da5159cc10bacaf19631601
 Author: jose perez <sinfallas@gmail.com>
 Date:   Tue Oct 6 21:14:28 2015 -0430
 
     * se agrega el doi
 
-commit 506dd1934f467d5d68105827b8f4445a382b02a2
+commit 506dd1934f467d5d68105827b8f4445a382b02a2 (tag: v0.1.2.1)
 Author: jose perez <sinfallas@gmail.com>
 Date:   Sat Aug 1 21:51:29 2015 -0430
 
