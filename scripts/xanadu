@@ -1,13 +1,6 @@
 #!/bin/bash
-### BEGIN INIT INFO
-# Provides:          xanadu
-# Required-Start:    qemu-kvm
-# Required-Stop:
-# Default-Start:     S
-# Default-Stop:      0 6
-# Short-Description: xanadu start/stop script
-# Description:       xanadu start/stop script, elaborado por sinfallas
-### END INIT INFO
+# Made by Sinfallas <sinfallas@yahoo.com>
+# Licence: GPL-2
 source variables
 case "$1" in
 	start)
