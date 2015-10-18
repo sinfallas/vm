@@ -1,0 +1,23 @@
+Prevenir IP Spoofing.
+
+Por spoofing se conoce a la creación de tramas TCP/IP utilizando una dirección IP falseada. Spoofing, en términos de seguridad de redes hace referencia al uso de técnicas de suplantación de identidad generalmente con usos maliciosos o de investigación. 
+
+Esto se consigue generalmente gracias a programas destinados a ello y puede ser usado para cualquier protocolo dentro de TCP/IP como ICMP, UDP o TCP. Hay que tener en cuenta que las respuestas del host que reciba los paquetes alterados irán dirigidas a la IP falsificada. Por ejemplo si enviamos un ping (paquete icmp "echo request") suplantado, la respuesta será recibida por el host al que pertenece la IP legalmente. Este tipo de spoofing unido al uso de peticiones broadcast a diferentes redes es usado en un tipo de ataque de flood conocido como ataque Smurf. (Texto extraído de Wikipedia: http://es.wikipedia.org/wiki/IP_spoofing#IP_Spoofing )
+
+
+Evitarlo es bastante sencillo:
+
+Editamos /etc/host.conf
+
+sudo su
+
+nano /etc/host.conf
+
+Y agregamos o editamos
+
+order bind,hosts
+nospoof on
+
+Guardamos
+
+

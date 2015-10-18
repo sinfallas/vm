@@ -1,0 +1,119 @@
+psad - The Port Scan Attack Detector (Detector de Ataques de scaneo de puerto)
+
+psad emplea iptables para detectar, alertar y opcionalmente bloquear escaneos de puertos y otros tráficos sospechosos. En las exploraciones de TCP psad analiza indicadores TCP para determinar el tipo de escaneado (syn, fin, xmas, etc.) y sus correspondientes opciones en línea de comandos que puedan ser suministrados a nmap para generarla. Además, psad hace uso de de TCP, UDP, ICMP y sus firmas contenidas dentro de la detección de intrusos de la aplicación Snort (ver: http://www.snort.org/) que se usa para detectar el tráfico de red sospechoso,  tales como puertas traseras comunes, herramientas DDoS, OS fingerprinting entre otros. 
+
+Por defecto psad también proporciona alertas con las reglas de snort que son detectados directamente por iptables a través del uso de un conjunto de reglas generada por fwsnort (ver: http://www.cipherdyne.org/fwsnort/). Esto permite que psad pueda enviar mensajes de alertas de posibles ataques a la capa de aplicación. 
+
+psad esaltamente configurables permitiendo al sysadmin definir que constituye un escaneo de puertos u otro tipo de tráfico sospechoso. Las alertas de correo electrónico enviados por psad contiene la ip de barrido, el número de paquetes enviados a cada puerto, TCP, UDP, ICMP o firmas que se han combinado (por ejemplo, "NMAP XMAS scan "), junto con el rango de puerto de la máquina, el nivel de riesgo actual (que va desde 1 al 5), info de DNS reverse, y un  whois. 
+
+psad también hace uso de diversos campos de cabecera de paquetes asociados con los paquetes TCP SYN pasivamente de los sistemas de acciones remotas defingerprinter de la que son originadas por los escaneos. Esto requiere que el uso de la opción - log-tcp-options para la regla de iptables, si esta opción no se utiliza, psad recurrirá a un método de toma de fingerprinter que hace uso de la longitud del paquete, TTL y los valores de TOS, ID IP y TCP.
+
+Para más información pueden leer el mán: http://manpages.ubuntu.com/manpages/precise/man8/psad.8.html
+
+El amigo @phenobarbital indica como instalar y configurar psad:
+
+Instalación
+
+sudo su
+
+apt-get install psad
+
+archivo de configuración: /etc/psad/psad.conf
+
+- configurar HOSTNAME, EMAIL_ADDRESSES
+
+Nota: en Debian NO VIENE configurado psad.conf, pero en Fedora y Mint si (me imagino que ubuntu también)
+
+- desactivar ipv6
+
+ENABLE_IPV6_DETECTION=N
+
+- conectar con shorewall:
+
+FW_MSG_SEARCH               Shorewall:net2all:DROP:;
+FW_MSG_SEARCH               Shorewall:net2fw:ACCEPT:;
+
+En mi regla "net2all" y en la regla "net2fw" he puesto "info" para que psad determine si hay escaneo de puertos y agregue las reglas a Shorewall (sino, actua usando iptables puro).
+
+- reiniciar:
+
+service psad restart
+
+- evaluar tu firewall (luego de configurado shorewall)
+
+psad --fw-analyze
+
+[+] Parsing /sbin/iptables INPUT chain rules.
+[+] Parsing /sbin/iptables FORWARD chain rules.
+[+] Firewall config looks good.
+[+] Completed check of firewall ruleset.
+[+] Results in /var/log/psad/fw_check
+[+] Exiting.
+
+y genero un script para actualizarlo una vez a la semana psad
+
+cat <<EOF > /etc/cron.weekly/psad.sh
+
+#!/bin/bash
+# update psad
+psad --sig-update
+# reload psad
+psad -H
+EOF
+
+chmod +x /etc/cron.weekly/psad.sh
+
+--- 
+
+Cabe destacar que:
+
+Las opciones:
+
+- EMAIL_ADDRESSES             root@localhost;
+
+Sea cambiada por su cuenta email, de esa forma le será enviado las alertas correspondientes.
+
+- CHECK_INTERVAL              5;
+
+Es un tiempo relativamente pequeño, se sugiere cambiarlo a uno mayor 
+
+- CHECK_INTERVAL              30;
+
+- ENABLE_DSHIELD_ALERTS       N; 
+
+cambiarlo por:
+
+- ENABLE_DSHIELD_ALERTS       Y;
+
+al detectarse algún ataque el sistema enviara un email a: 
+
+DSHIELD_ALERT_EMAIL         reports@dshield.org;
+
+Se recomienda no quitar o cambiar, de esa forma colaboramos con ese importante servicio
+
+
+- Una vez cambiado volvemos a reiniciar el servicio:
+
+service psad restart
+
+Opciones:
+
+service psad start
+service psad stop
+service psad restart
+
+Actualizar las firmas 
+
+
+psad --sig-update
+
+Ver el status 
+
+psad -S
+
+Para eliminar las IP bloqueadas
+
+psad -F
+
+
+

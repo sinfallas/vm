@@ -1,0 +1,56 @@
+fwsnort
+
+fwsnort convierte reglas de Snort en reglas iptables y genera un script shell que ejecuta los comandos de iptables resultantes. Este conjunto de reglas permite que el tráfico de red que coincide con las firmas de Snort (ataques y otras conductas sospechosas en la red) puedan ser registrados cambiando al vuelo las reglas iptables.
+
+Instalación y configuración
+
+sudo su
+
+apt-get install fwsnort
+
+Actualizamos las reglas
+
+fwsnort --update-rules
+
+Sí genera algun error inesperado, usar:
+
+fwsnort --no-ipt-test --verbose
+
+Ejecutamos:
+
+fwsnort
+
+El fichero de configuración esta en:
+
+/etc/fwnort/fwsnort.conf
+
+Generamos un archivo para cargar las reglas (Es un script iptables generatado por fwsnort)
+
+/etc/fwnort/fwsnort.sh
+
+Creamos un cron para su actualización semanal
+
+nano /etc/cron.weekly/fwsnort.sh
+
+#!/bin/bash
+fwsnort --update-rules
+fwsnort
+
+Guardamos
+
+Listo!
+
+Algunas opciones de fwsnort
+
+Ejecutar el iptable generado por  fwsnort 
+
+fwsnort --ipt-apply 
+
+Elimina las reglas generadas por fwsnort
+
+fwsnort --ipt-flush
+
+Documentación:
+
+http://cipherdyne.org/fwsnort/docs/
+

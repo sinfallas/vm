@@ -1,0 +1,115 @@
+IPtables
+Es un sistema de firewall vinculado e integrado al kernel de linux, es parte del sistema operativo. Iptables es la herramienta estándar de todas las distribuciones modernas de GNU/Linux.
+
+Iptables está basado en el uso de TABLAS dentro de las tablas, CADENAS, formadas por agrupación de REGLAS, parámetros que relativizan las reglas y finalmente una ACCION, que es la encargada de decir qué destino tiene el paquete.
+
+Listemos las reglas actuales
+
+sudo su
+
+iptables -L
+
+Añadir sino estan estas reglas básicas por consola
+
+# Básicas
+
+iptables -A INPUT -p tcp –dport 23 -j DROP
+
+iptables -A INPUT -i lo -j ACCEPT
+
+iptables -A INPUT -p icmp -m limit –limit 1/sec -j ACCEPT
+
+iptables -A INPUT -m state –state RELATED,ESTABLISHED -j ACCEPT
+
+iptables -A INPUT -j LOG –log-level warning
+
+iptables -A INPUT -f -j DROP
+
+iptables -A INPUT -m state –state INVALID -j DROP
+
+iptables -A INPUT -j DROP
+
+iptables -A FORWARD -j DROP
+
+# Evitar en cierto modo ataques DDOS y paquetes mal formados
+
+iptables -A INPUT -p tcp –syn -j REJECT –reject-with icmp-port-unreachable
+
+iptables -N syn-flood
+
+iptables -A syn-flood -m limit –limit 100/second –limit-burst 150 -j RETURN
+
+iptables -A syn-flood -j LOG –log-prefix “SYN flood: ”
+
+iptables -A syn-flood -j DROP
+
+iptables -A INPUT -p tcp -m tcp –tcp-flags SYN,RST,ACK SYN -m limit –limit 1/sec -j ACCEPT
+
+iptables -N PKT_FAKE
+
+iptables -A PKT_FAKE -m state –state INVALID -j DROP
+
+iptables -A PKT_FAKE -p tcp –dport 80 –tcp-flags ALL ACK,RST,SYN,FIN -j DROP
+
+iptables -A PKT_FAKE -p tcp –dport 80 –tcp-flags SYN,FIN SYN,FIN -j DROP
+
+iptables -A PKT_FAKE -p tcp –dport 80 –tcp-flags SYN,RST SYN,RST -j DROP
+
+iptables -A PKT_FAKE -p tcp –dport 80 ! –syn -m state –state NEW -j DROP
+
+iptables -A PKT_FAKE -f -j DROP
+
+iptables -A PKT_FAKE -j RETURN
+
+iptables -A OUTPUT -p udp -m limit –limit 100/s -j ACCEPT
+
+iptables -A OUTPUT -p udp -j DROP
+
+iptables -A INPUT -p icmp -m state –state NEW –icmp-type echo-request -m limit –limit 1/s –limit-burst 1 -j ACCEPT
+
+iptables -A INPUT -p icmp -j DROP
+
+#Evitamos que escaneos
+
+iptables -A INPUT -i $ETH -p tcp -m tcp –tcp-flags FIN,SYN,RST,PSH,ACK,URG NONE –j DROP
+
+iptables -A INPUT -i $ETH -p tcp -m tcp –tcp-flags SYN,FIN SYN,FIN –j DROP
+
+iptables -A INPUT -i $ETH -p tcp -m tcp –tcp-flags SYN,RST SYN,RST –j DROP
+
+iptables -A INPUT -i $ETH -p tcp -m tcp –tcp-flags FIN,RST FIN,RST –j DROP
+
+iptables -A INPUT -i $ETH -p tcp -m tcp –tcp-flags ACK,FIN FIN –j DROP
+
+iptables -A INPUT -i $ETH -p tcp -m tcp –tcp-flags ACK,URG URG –j DROP
+
+Guardamos
+
+iptables-save
+
+Si quieres eliminar una regla solo añade la opción -D (delete). y quita la -A (append)
+
+Se recomienda implementar fwsnort y fail2ban para endurecer un poco mas el iptables
+
+Hay que tener especial cuidado con los siguientes puertos, no cerrarlos si se posee esos servicios activos:
+
+21 - ftp (el servidor FTP, a dejar según utilización).
+22 - ssh (el acceso al shell criptado, dejarlo abierto !) SSH, scp, SFTP.
+25 - smtp (el servidor de correo entrante, dejar en la mayor parte de los casos).
+53 - dns (el servidor DNS, dejar en la mayoría de los casos).
+80 - http (servidor web, dejar).
+110 - pop3 (el acceso a los e-mails, dejar en la mayoría de los casos).
+123 - NTP Protocolo de sincronización de tiempo
+143 - imap (acceso a los mails, dejar si no utiliza pop3).
+443 - https (acceso al web criptado, dejar según sus preferencias de utilización).
+587 - Simple Mail Transfer Protocol
+993 - imap sobre SSL (E-mail)
+995 - POP3 sobre SSL (E-mail)
+3306 - MySQL sistema de gestión de bases de datos
+5222 - Jabber/XMPP conexión de cliente
+5223 - Jabber/XMPP puerto por defecto para conexiones de cliente SSL
+5269 - Jabber/XMPP conexión de servidor
+5432 - PostgreSQL sistema de gestión de bases de datos
+10000 - webmin (panel de configuración de servidor, dejar si lo necesita).
+
+Una buena documentación: http://doc.ubuntu-es.org/Iptables

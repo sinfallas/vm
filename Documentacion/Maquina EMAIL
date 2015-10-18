@@ -1,0 +1,721 @@
+Documentación Máquina ViSeR EMAIL 
+
+Consideraciones Generales: 
+
+Máquina Postfix - Clamav - Spamassassin - DKIM - SPF - Dovecot
+
+Postfix (http://www.postfix.org)
+
+Postfix es un Agente de Transporte de Correo (MTA) de código abierto, es decir, un programa informático para el enrutamiento y envío de correo electrónico. Se distrinuye bajo Licencia Pública IBM v.1.0, que a pesar de ser una licencia de software libre, resulta incompatible con la Licencia GPL (aunque sí lo sea con GPL v1.0). 
+
+Las principales características de Postfix son:
+
+	Soporte de TLS (Transport Layer Security).
+	Soporte de distintas bases de datos LDAP, MySQL, PostgreSQL
+	Soporte de mbox, maildir y dominios virtuales.
+	SMTP-AUTH, SASL y reescritura de dirección.
+	Soporte de Milter
+	Capacidad de manejar altos volúmenes de correo.
+	Diseño modular (no es un único programa monolítico).
+	Seguridad.
+	Gran Rendimiento
+	Estricto cumplimiento de los estándares de correo-e.
+	Soporte para administrar dominios virtuales.
+	Facilidad de configuración.
+	Compatibilidad hacia/desde fuera con Sendmail.
+	Integración con programas antivirus.
+
+
+CLAMAV  (http://www.clamav.net)
+ClamAV es un software antivirus open source (de licencia GPL). Proporciona una serie de herramientas antivirus diseñadas específicamente para el escaneo de correo electrónico. La arquitectura de ClamAV es escalable y flexible gracias a un demonio multihilo. 
+
+Incorpora soporte para formatos de compresión y ejecutables (ELF, PE) tanto comprimidos con packers como ofuscados. También soporta documentos PDF, RTF, HTML y de Microsoft Office; y su BBDD se actualiza varias veces al día.
+
+DomainKeys Identified Mail - DKIM
+
+DomainKeys Identified Mail (DKIM) es un mecanismo de autenticación de correo electrónico que permite a una organización responsabilizarse del envío de un mensaje, de manera que éste pueda ser validado por un destinatario. 
+
+DKIM usa criptografía de clave pública para permitir al origen firmar electrónicamente correos electrónicos legítimos de manera que puedan ser verificados por los destinatarios. 
+
+DKIM también protege contra la manipulación de correo electrónico, proporcionando integridad de extremo a extremo, desde un módulo firmante a un módulo validador.
+
+Hay algunas ventajas para el que envía correo al firmarlo con DKIM:
+
+Permite reducir drásticamente la falsificación de dominios de origen del mensaje, ya que podremos identificar perfectamente aquellos e-mails que hayan sido firmados si su dominio tiene el DKIM habilitado.
+
+El poseedor del dominio puede centrar sus esfuerzos para evitar el abuso reduciendo el ámbito de uso inapropiado de ese dominio a sus mismos usuarios.
+
+Sender Policy Framework (SPF)
+
+es una protección contra la falsificación de direcciones en el envío de correo electrónico.
+
+Identifica, a través de los registros de nombres de dominio (DNS), a los servidores de correo SMTP autorizados para el transporte de los mensajes.
+
+SPF extiende el protocolo SMTP para permitir comprobar las máquinas autorizadas a enviar correo para un dominio determinado. La idea es identificar las máquinas autorizadas por su dirección IP, y que esta identificación la haga el responsable del dominio que recibirá el correo.
+
+SpamAssassin (http://spamassassin.apache.org/‎)
+
+SpamAssassin es una implementación que utiliza un sistema de puntuación, basado sobre algoritmos de tipo genético, para identificar mensajes que pudieran ser sospechosos de ser correo masivo no solicitado (SPAM), añadiendo cabeceras a los mensajes de modo que pueda ser filtrados por el cliente de correo electrónico o MUA (Mail User Agent).
+
+Dovecot
+
+Dovecot es un servidor de IMAP y POP3 de código abierto para sistemas GNU/Linux / UNIX-like, escrito fundamentalmente pensando en la seguridad.  
+
+Dovecot puede trabajar con el estándar mbox, Maildir y sus propios formatos nativos dbox de alto rendimiento. Es completamente compatible con implementaciones de servidores UW IMAP y Courier IMAP, así como con clientes que accedan directamente a los buzones de correo.
+
+SASL y Cyrus SASL.
+
+SASL (Simple Authentication and Security Layer) es un estructura para seguridad de datos en protocolos de Internet. Desempareja mecanismos de la autenticación desde protocolos de aplicaciones, permitiendo, en teoría, cualquier mecanismo de autenticación soportado por SASL para ser utilizado en cualquier protocolo de aplicación que capaz de utilizar SASL. Actualmente SASL es un protocolo de la IETF (Internet Engineering Task Force) que ha sido propuesto como estándar. Está especificado en el RFC 2222 creado por John Meyers en la Universidad Carnegie Mellon.
+
+Cyrus SASL es una implementación de SASL que puede ser utilizada del lado del servidor o del lado del cliente y que incluye como principales mecanismos de autenticación soportados a ANONYMOUS, CRAM-MD5, DIGEST-MD5, GSSAPI y PLAIN. El código fuente incluye también soporte para los mecanismos LOGIN, SRP, NTLM, OPT y KERBEROS_V4.
+
+DSA.
+
+DSA (Digital Signature Algorithm o Algoritmo de Firma digital) es un algoritmo creado por el NIST (National Institute of Standards and Technology o Instituto Nacional de Normas y Tecnología de EE.UU.), publicado el 30 de agosto de 1991, como propuesta para el proceso de firmas digitales. Se utiliza para firmar información, más no para cifrar ésta.
+
+RSA.
+
+RSA, acrónimo de los apellidos de sus autores, Ron Rivest, Adi Shamir y Len Adleman, es un algoritmo para el ciframiento de claves públicas que fue publicado en 1977, patentado en EE.UU. en 1983 por el el Instituto Tecnológico de Michigan (MIT). RSA es utilizado ampliamente en todo el mundo para los protocolos destinados para el comercio electrónico.
+
+OpenSSL.
+
+OpenSSL es una implementación libre, de código abierto, de los protocolos SSL (Secure Sockets Layer o Nivel de Zócalo Seguro) y TLS (Transport Layer Security o Seguridad para Nivel de Transporte). Está basado sobre el extinto proyecto SSLeay.
+
+LMTP
+
+LMTP (Local Mail Transfer Protocol) o protocolo de transporte local de correo. Este protocolo esta basado sobre el protocolo SMTP y está diseñado como una alternativa a SMTP para situaciones donde el lado receptor carece de cola de correo (queue mail), como un MTA que entiende conversaciones SMTP. Puede ser utilizado como una forma alternativa y más eficiente para el transporte de correo entre Postfix y Dovecot.
+
+Antes de comenzar:
+
+Se deben poseer estos puertos abiertos desde la máquina firewall:
+
+	25   ->	 SMTP Simple Mail Transfer Protocol (Protocolo Simple de Transferencia de Correo)
+	110  ->	 POP3 Post Office Protocol (E-mail)
+	143  ->  IMAP4 Internet Message Access Protocol (E-mail)
+	465  ->	 SMTP Sobre SSL. Utilizado para el envío de correo electrónico (E-mail)
+	587  ->  SMTP envío ( se recomienda que no se acepten envíos no autenticados a través de este puerto.)
+	8891 ->  Permite que dos hosts establezcan una conexión e intercambiar flujos de datos. 
+	8892 ->  Garantiza la entrega de los datos y también que los paquetes serán entregados en el puerto 8892 en el mismo orden en que fueron enviados. 
+
+El funcionamiento ideal de esta medida pasaría porque los remitentes se conectaran de forma autenticada (exigiendo usuario y contraseña) a través del puerto 587, y que el puerto 25 se usará únicamente para el intercambio de mensajes entre servidores de correo. 
+
+
+Instalación y configuración:
+
+Toda la instalación se hará usando la consola de comandos.
+
+- sudo su (introduzca la clave root)
+
+Usaremos apt-get, pero si posee instalado aptitude también puede usarlo
+
+- mkdir mail
+
+- cd mail
+
+- aptitude install postfix libsasl2-2 sasl2-bin openssl
+
+- dpkg-reconfigure postfix
+
+Contestar las preguntas de configuración, puede guiarse con las siguientes:
+
+Configuracion:
+     General type of mail configuration: Internet Site
+    NONE doesn't appear to be requested in current config
+    System mail name: server1.example.com
+    Root and postmaster mail recipient: <admin_user_name>
+    Other destinations for mail: server1.example.com, example.com, localhost.example.com, localhost
+    Force synchronous updates on mail queue?: No
+    Local networks: 127.0.0.0/8
+    Yes doesn't appear to be requested in current config
+    Mailbox size limit (bytes): 520000
+    Local address extension character: +
+    Internet protocols to use: all
+
+  	postconf -e 'home_mailbox = Maildir/'
+  	postconf -e 'mailbox_command ='
+
+    Configurar Postfix con SMTP AUTH usando SASL (saslauthd):
+
+	postconf -e 'smtpd_sasl_local_domain ='
+	postconf -e 'smtpd_sasl_auth_enable = yes'
+	postconf -e 'smtpd_sasl_security_options = noanonymous'
+	postconf -e 'broken_sasl_auth_clients = yes'
+	postconf -e 'smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination'
+	postconf -e 'inet_interfaces = all'
+
+Agregar las siguientes lineas en el archivo que editaremos:
+
+- nano /etc/postfix/sasl/smtpd.conf
+
+	pwcheck_method: saslauthd
+	mech_list: plain login
+
+- Guardar
+
+Generamos el certificado que emplearemos en TLS encryption y/o Certificado de Autenticación:
+
+- touch smtpd.key
+- chmod 600 smtpd.key
+- openssl genrsa 1024 > smtpd.key
+- openssl req -new -key smtpd.key -x509 -days 3650 -out smtpd.crt  
+
+Guía:
+
+    Country Name (2 letter code) [AU]:VE
+    State or Province Name (full name) [Some-State]:Carabobo
+    Locality Name (eg, city) []:Valencia
+    Organization Name (eg, company) [Internet Widgits Pty Ltd]:ViSeRProject
+    Organizational Unit Name (eg, section) []:ViSeR
+    Common Name (e.g. server FQDN or YOUR name) []:ViSeR
+    Email Address []:info@viserproject.com
+
+- openssl req -new -x509 -extensions v3_ca -keyout cakey.pem -out cacert.pem -days 3650  
+
+Guía:
+
+    Country Name (2 letter code) [AU]:VE
+    State or Province Name (full name) [Some-State]:Carabobo
+    Locality Name (eg, city) []:Valencia
+    Organization Name (eg, company) [Internet Widgits Pty Ltd]:ViSeRProject
+    Organizational Unit Name (eg, section) []:ViSeR
+    Common Name (e.g. server FQDN or YOUR name) []:ViSeR
+    Email Address []:info@viserproject.com
+
+
+- mv smtpd.key /etc/ssl/private/
+- mv smtpd.crt /etc/ssl/certs/
+- mv cakey.pem /etc/ssl/private/
+- mv cacert.pem /etc/ssl/certs/
+
+Configuramos Postfix para TLS encryption tanto para el correo entrante y saliente:
+
+	postconf -e 'smtp_tls_security_level = may'
+	postconf -e 'smtpd_tls_security_level = may'
+	postconf -e 'smtpd_tls_auth_only = no'
+	postconf -e 'smtp_tls_note_starttls_offer = yes'
+	postconf -e 'smtpd_tls_key_file = /etc/ssl/private/smtpd.key'
+	postconf -e 'smtpd_tls_cert_file = /etc/ssl/certs/smtpd.crt'
+	postconf -e 'smtpd_tls_CAfile = /etc/ssl/certs/cacert.pem'
+	postconf -e 'smtpd_tls_loglevel = 1'
+	postconf -e 'smtpd_tls_received_header = yes'
+	postconf -e 'smtpd_tls_session_cache_timeout = 3600s'
+	postconf -e 'tls_random_source = dev:/dev/urandom'
+	postconf -e 'myhostname = mail.viserproject.com'
+
+- service postfix restart
+
+Editar  /etc/default/saslauthd y colocar START=yes
+
+- nano /etc/default/saslauthd 
+
+- dpkg-statoverride --force --update --add root sasl 755 /var/spool/postfix/var/run/saslauthd
+
+- service saslauthd start
+
+Agregamos el Grupo vmail
+
+- groupadd -g 5000 vmail
+
+- useradd -m -u 5000 -g 5000 -s /bin/bash vmail
+
+En el archivo /etc/postfix/vhosts colocar los dominios que comprenderán la maquina
+
+- nano /etc/postfix/vhosts
+
+eldominio1.com
+eldominio2.com
+
+- Guardar
+
+Editar /etc/postfix/master.cf  # Colocar puerto 587, descomentando submission inet, y añadir 
+
+- nano /etc/postfix/master.cf
+
+        # Colocar puerto 587, descomentando submission inet
+
+	virtual_mailbox_domains = /etc/postfix/vhosts
+	virtual_mailbox_base = /home/vmail
+	virtual_mailbox_maps = hash:/etc/postfix/vmaps
+	virtual_minimum_uid = 1000
+	virtual_uid_maps = static:5000
+	virtual_gid_maps = static:5000
+
+- Guardar
+
+- service postfix restart
+
+Instalamos clamav (antivirus)
+
+apt-get install clamav-daemon clamav
+
+Editar /etc/postfix/main.cf 
+
+- nano /etc/postfix/master.cf
+
+Agregar: 
+
+	content_filter = scan:127.0.0.1:10026
+	receive_override_options = no_address_mappings
+
+	# AV scan filter (used by content_filter)
+	scan      unix  -       -       n       -       16      smtp
+		-o smtp_send_xforward_command=yes
+	# For injecting mail back into postfix from the filter
+	127.0.0.1:10025 inet  n -       n       -       16      smtpd
+	o content_filter=
+	-o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
+	-o smtpd_helo_restrictions=
+	-o smtpd_client_restrictions=
+	-o smtpd_sender_restrictions=
+	-o smtpd_recipient_restrictions=permit_mynetworks,reject
+	-o mynetworks_style=host
+	-o smtpd_authorized_xforward_hosts=127.0.0.0/8
+
+Guardar:
+
+Agregamos el usuarios  clamav
+
+- adduser clamsmtp clamav
+
+Reiniciamos servicios
+
+- service postfix restart
+- service clamsmtp restart
+- service clamav-daemon restart
+
+Instalamos SPF y DKIM 
+
+- apt-get install postfix-policyd-spf-python 
+- apt-get install postfix-policyd-spf-perl spfmilter
+- apt-get install opendkim opendkim-tools dk-filter dkim-filter 
+- apt-get spamassassin spamc
+
+- nano /etc/postfix/master.cf  
+
+- Añadir 
+
+	policy-spf  unix  -       n       n       -       -       spawn
+	     user=nobody argv=/usr/bin/policyd-spf
+
+Editar
+- nano /etc/postfix/main.cf 
+
+colocar
+
+	smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination, check_policy_service unix:private/policy-spf
+
+- Guardar
+
+- service postfix restart
+
+Generamos la clave (cambia tudominio por el tuyo)
+
+- dkim-genkey -d mail.tudominio
+
+- ls
+
+- default.private  default.txt
+
+A continuación, creamos un directorio para la clave privada, y copiamos el archivo en el directorio.
+
+- mkdir /etc/postfix/dkim
+
+- cp default.private  /etc/postfix/dkim/tudominio_default.private
+
+Ahora, para la configuración principal de DKIM, buscamos en / etc / dkim-filter.conf.
+
+Editamos o eliminamos el archivo, por lo que las líneas activas en el archivo de configuración, se ve algo parecido a esto.
+
+  "Selector" es "default"  # a menos que se especifique otra cosa en el parámetro-s cuando generamos las claves con la herramienta dkim-genkey.
+
+Se ha habilitado el registro del estado de verificación de e-mails. En realidad, sólo se recomienda para la depuración.
+
+Quedaría como esto:
+
+- nano /etc/dkim-filter.conf
+
+	syslog			yes
+	SysLogSuccess           yes #solo para debugging.
+
+	Domain		example.com #cambiar por el tuyo 
+	KeyFile		/etc/postfix/dkim/examplecom_default.private #cambiar por el tuyo
+	Selector	default
+
+- Guardamos
+
+Configuramos la IP y el puerto de escucha para dkim-filtro, esto se hace en /etc/default/dkim-filter
+
+  Edite o elimine el archivo, recuerde poner la IP de tu IP.
+  Es posible utilizar unixsocket, que sería mejor. Pero debido a que Postfix se ejecuta en chroot, tanto Postfix y DKIM, deben ser capaces de leer el archivo.
+
+- nano /etc/default/dkim-filter
+
+Editamos 
+
+SOCKET="inet:8892@127.0.0.1" # listen on 127.0.0.1 on port 8892
+
+- Guardar
+
+Configuramos Postfix para que escuche en el filtro DKIM, añadiendo lo siguiente en el fichero main.cf.
+
+- nano /etc/postfix/main.cf 
+
+	# DKIM
+	milter_default_action = accept
+	milter_protocol = 2
+	smtpd_milters = inet:localhost:8891,inet:localhost:8892
+	non_smtpd_milters = inet:localhost:8891,inet:localhost:8892
+
+Ahora tenemos que configurar el DNS para nuestro dominio. Compruebe el archivo default.txt, y tenga en cuenta los valores de TXT y la clave. (se acorto la llave)
+
+- cat default.txt
+
+default._domainkey IN TXT "v=DKIM1; g=*; k=rsa; p=PpYHdE2tevfEpvL1Tk2dDYv0pF28/f 5MxU83x/0bsn4R4p7waPaz1IbOGs/6bm5QIDAQAB" \ ;
+
+- Guardamos
+
+Ahora creamos un registro DNS TXT en el servidor DNS, como éste. Tenga en cuenta que se ha añadido t = y DKIM que hace funcionar en modo de prueba. Esto significa que incluso si la verificación falla, no obstante será entregado el correo. Cuando eveything está bien, retire el parámetro t = y para cuando este en producción.
+
+- nano default.txt
+
+Host:   default._domainkey
+string:	v=DKIM1; g=*; k=rsa; p=PpYHdE2tevfEpvL1Tk2dDYv0pF28/f 5MxU83x/0bsn4R4p7waPaz1IbOGs/6bm5QIDAQAB; t=y
+
+
+A continuación: 
+
+- opendkim-genkey -t -s mail -d tudominio
+- mkdir  /etc/mail/
+- cp mail.private /etc/mail/dkim.key
+- cd /etc/mail
+
+- nano mail.txt
+
+- Agregamos la siguiente linea:
+
+mail._domainkey.TUDOMINIO IN TXT "v=DKIM1; g=*; k=rsa; p=PpYHdE2tevfEpvL1Tk2dDYv0pF28/f 5MxU83x/0bsn4R4p7waPaz1IbOGs/6bm5QIDAQAB";
+
+- Guardar
+
+- service opendkim start
+
+- service postfix restart
+
+- openssl genrsa -out private.key 768
+- openssl rsa -in private.key -out public.key -pubout -outform PEM
+
+- Creamos
+
+- nano /etc/default/ilist
+
+- Añadir
+
+	#gestion
+	192.168.100.10
+	#apache
+	192.168.100.2
+	#firewall
+	192.68.100.1
+
+- Guardar
+
+DAEMON_OPTS="$DAEMON_OPTS -d domain.tld -s /etc/mail/domainkey.key -S mail -i /etc/default/ilist" _domainkey.domain.tld. IN TXT "t=y; o=~;
+
+mail._domainkey.domain.tld. IN TXT "k=rsa; t=y; p=PpYHdE2tevfEpvL1Tk2dDYv0pF28/f 5MxU83x/0bsn4R4p7waPaz1IbOGs/6bm5QIDAQAB"
+
+- service dk-filter start
+
+- service postfix restart
+
+Configurando spamassassin
+
+- groupadd -g 5001 spamd 
+- useradd -u 5001 -g spamd -s /sbin/nologin -d /var/lib/spamassassin spamd 
+- mkdir /var/lib/spamassassin 
+- chown spamd:spamd /var/lib/spamassassin
+
+- nano /etc/default/spamassassin
+
+- cambiar por
+
+	ENABLED=1
+	SAHOME="/var/lib/spamassassin/"
+	OPTIONS="--create-prefs --max-children 5 --username spamd --helper-home-dir ${SAHOME} -s ${SAHOME}spamd.log"
+	PIDFILE="${SAHOME}spamd.pid"
+	CRON=1
+
+- Guardar
+
+Editamos
+
+- nano /etc/spamassassin/local.cf
+
+Editamos o Añadimos:
+
+	rewrite_header Subject ***SPAM*** 
+	report_safe 0
+	required_score 5.0
+	use_bayes 1
+	bayes_auto_learn 1
+
+- Guardar
+
+service spamassassin start
+
+Dovecot IMAP/POP3
+
+Instalación
+
+- apt-get install dovecot-core cyrus-sasl cyrus-sasl-plain
+
+Hacemos respaldo 
+
+- mv /etc/dovecot/dovecot.conf /etc/dovecot/dovecot.conf.orig
+
+- postconf -e 'smtpd_sasl_type = dovecot'
+- postconf -e 'smtpd_sasl_path = private/auth-client'
+- postconf -e 'smtpd_sasl_auth_enable = yes'
+
+Abrimos para editar  /etc/dovecot/dovecot.conf
+
+- nano /etc/dovecot/dovecot.conf 
+
+y copiamos:
+
+	auth_mechanisms = plain cram-md5
+	auth_verbose = yes
+	base_dir = /var/run/dovecot/
+	info_log_path = /var/log/dovecot.info
+	log_path = /var/log/dovecot
+	log_timestamp = "%Y-%m-%d %H:%M:%S "
+	mail_location = maildir:/home/vmail/%d/%n
+	passdb {
+	  args = /etc/dovecot/passwd
+	  driver = passwd-file
+	}
+	protocols = imap pop3
+	service auth {
+	  executable = /usr/lib/dovecot/auth
+	  user = root
+	}
+	service imap-login {
+	  chroot = login
+	  executable = /usr/lib/dovecot/imap-login
+	  user = dovecot
+	}
+	service imap {
+	  executable = /usr/lib/dovecot/imap
+	}
+	service pop3-login {
+	  chroot = login
+	  executable = /usr/lib/dovecot/pop3-login
+	  user = dovecot
+	}
+	service pop3 {
+	  executable = /usr/lib/dovecot/pop3
+	}
+	ssl = no
+	userdb {
+	  args = /etc/dovecot/users
+	  driver = passwd-file
+	}
+	valid_chroot_dirs = /var/spool/vmail
+	protocol pop3 {
+	  pop3_uidl_format = %08Xu%08Xv
+	}
+
+- Guardamos
+
+- Creamos un script para añadir usuarios con el siguiente contenido:
+
+ - nano /usr/local/sbin/adddovecotuser 
+
+	 #!/bin/sh
+	if [ ! $# = 1 ]
+	 then
+	  echo "Usage: $0 username@domain"
+	  exit 1
+	 else
+	  user=`echo "$1" | cut -f1 -d "@"`
+	  domain=`echo "$1" | cut -s -f2 -d "@"`
+	  if [ -x $domain ]
+	   then
+	    echo "No domain given\nUsage: $0 username@domain"
+	    exit 2
+	  fi
+	  echo "Adding user $user@$domain to /etc/dovecot/users"
+	  echo "$user@$domain::5000:5000::/home/vmail/$domain/$user/:/bin/false::" >> /etc/dovecot/users
+
+	  # Create the needed Maildir directories
+	  echo "Creating user directory /home/vmail/$domain/$user"
+	  # maildirmake.dovecot does only chown on user directory, we'll create domain directory instead
+	  if [ ! -x /home/vmail/$domain ]
+	   then
+	    mkdir /home/vmail/$domain
+	    chown 5000:5000 /home/vmail/$domain
+	    chmod 700 /home/vmail/$domain
+	  fi
+	  /usr/bin/maildirmake.dovecot /home/vmail/$domain/$user 5000:5000
+	  # Also make folders for Drafts, Sent, Junk and Trash
+	  /usr/bin/maildirmake.dovecot /home/vmail/$domain/$user/.Drafts 5000:5000
+	  /usr/bin/maildirmake.dovecot /home/vmail/$domain/$user/.Sent 5000:5000
+	  /usr/bin/maildirmake.dovecot /home/vmail/$domain/$user/.Junk 5000:5000
+	  /usr/bin/maildirmake.dovecot /home/vmail/$domain/$user/.Trash 5000:5000
+
+	  # To add user to Postfix virtual map file and relode Postfix
+	  echo "Adding user to /etc/postfix/vmaps"
+	  echo $1  $domain/$user/ >> /etc/postfix/vmaps
+	  postmap /etc/postfix/vmaps
+	  postfix reload
+	fi
+	echo "\nCreate a password for the new email user"
+	#SWAP THE FOLLOWING passwd LINES IF USING A UBUNTU VERSION PRIOR TO 12.04
+	#passwd=`dovecotpw`
+	passwd=`doveadm pw -u $user`
+	echo "Adding password for $user@$domain to /etc/dovecot/passwd"
+	if [ ! -x /etc/dovecot/passwd ]
+	 then
+	  touch /etc/dovecot/passwd
+	  chmod 640 /etc/dovecot/passwd
+	fi
+	echo  "$user@$domain:$passwd" >> /etc/dovecot/passwd
+
+	exit 0
+
+- Guardamos
+
+Le damos permiso de ejecución:
+
+- chmod +x /usr/local/sbin/adddovecotuser 
+
+Para crear un usuario solo hacemos:
+
+- adddovecotuser info@eldominio.com
+
+- Creamos un script para eliminar usuarios con el siguiente contenido:
+
+	#!/bin/bash
+	#
+	# deldovecotuser - for deleting virtual dovecot users
+	#
+	if [ ! $# = 1 ]
+	 then
+	  echo -e "Usage: $0 username@domain"
+	  exit 1
+	 else
+	  user=`echo "$1" | cut -f1 -d "@"`
+	  domain=`echo "$1" | cut -s -f2 -d "@"`
+	  if [ -x $domain ]
+	   then
+	    echo -e "No domain given\nUsage: $0 username@domain: "
+	    exit 2
+	  fi
+	fi
+	read -n 1 -p "Delete user $user@$domain from dovecot? [Y/N]? "
+	echo
+	case $REPLY in
+	 y | Y)
+	  new_users=`grep -v $user@$domain /etc/dovecot/users`
+	  new_passwd=`grep -v $user@$domain /etc/dovecot/passwd`
+	  new_vmaps=`grep -v $user@$domain /etc/postfix/vmaps`
+	  echo "Deleting $user@$domain from /etc/dovecot/users"
+	  echo "$new_users" > /etc/dovecot/users
+	  echo "Deleting $user@$domain from /etc/dovecot/passwd"
+	  echo "$new_passwd" > /etc/dovecot/passwd
+	  echo "Deleting $user@$domain from /etc/postfix/vmaps"
+	  echo "$new_vmaps" > /etc/postfix/vmaps
+	  postmap /etc/postfix/vmaps
+	  postfix reload
+	  read -n1 -p "Delete all files in /home/vmail/$domain/$user? [Y/N]? " DELETE
+	  echo
+	  case $DELETE in
+	   y | Y)
+	    echo "Deleting files in /home/vmail/$domain/$user"
+	    rm -fr /home/vmail/$domain/$user
+	   ;;
+	   * )
+	    echo "Not deleting files in /home/vmail/$domain/$user"
+	   ;;
+	  esac
+	 ;;
+	 * )
+	  echo "Aborting..."
+	 ;;
+	esac
+
+- Guardamos
+
+Le damos permisos de ejecución:
+
+- chmod +x /usr/local/sbin/deldovecotuser 
+
+Para eliminar un usuario:
+
+-  deldovecotuser info@eldominio.com
+
+ Editamos nuevamente /etc/dovecot/dovecot.conf y vamos a la sección #auth section"
+
+- nano /etc/dovecot/dovecot.conf
+
+Añadimos o moficamos:
+
+	auth default {
+	  mechanisms = plain cram-md5
+	  passdb passwd-file {
+	    args = /etc/dovecot/passwd
+	  }
+	  userdb passwd-file {
+	    args = /etc/dovecot/users
+	  }
+	  user = root
+	  socket listen {
+	    client {
+	      # The client socket is generally safe to export to everyone. Typical use
+	      # is to export it to your SMTP server so it can do SMTP AUTH lookups
+	      # using it.
+	      path = /var/spool/postfix/private/auth-client
+	      mode = 0660
+	      user = postfix
+	      group = postfix
+	    }
+	  }
+	}
+
+- service dovecot restart
+- service postfix restart
+
+Configurando Postfix para SASL
+
+postconf -e 'smtpd_sasl_auth_enable = yes'
+postconf -e 'smtpd_sasl_security_options = noplaintext,noanonymous'
+postconf -e 'smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination'
+postconf -e 'smtpd_sasl_type = dovecot'
+postconf -e 'smtpd_sasl_path = private/auth-client'
+echo "mech_list: cram-md5" > /etc/postfix/sasl/smtpd.conf
+
+service postfix restart
+
+Soporte para LMTP
+
+- postconf -e 'virtual_transport = lmtp:unix:/var/run/dovecot/lmtp'
+
+Luego editamos
+
+- nano /etc/dovecot/dovecot.conf 
+
+Modificamos o añadimos
+
+	protocols = imap pop3 lmtp
+
+- Guardamos
+
+Reiniciamos servicios
+
+service dovecot restart
+service postfix restart
+
+Configuración de máquina email culminada
+
+
+
+

@@ -1,0 +1,74 @@
+DenyHosts
+
+Es un poderoso programa que lee un archivo de logs del sistema como "messages" y detecta los intentos de acceso "ilegales" al demonio SSH u otros servicios, ya sea mediante ataques de diccionario, o mediante fuerza bruta, tomando las acciones necesarias para impedirlos.
+
+La manera en que funciona DenyHosts es que monitorea el archivo /var/log/auth.log (en el caso de Debian - Ubuntu y sus derivados) para detectar errores de autentificación al sistema y despues bajo ciertas reglas bloquer la IP o servicio que queramos mediante el archivo /etc/hosts.deny
+
+Sitio del proyecto: http://denyhosts.sourceforge.net/ 
+
+Instalación y configuración:
+
+sudo su
+
+apt-get install denyhosts
+
+Detenemos el servicio 
+
+service denyhosts stop
+
+El archivo de configuración: /etc/denyhosts.conf
+
+Cambiamos algunos parámetros:
+
+# Lugar donde se encuentra nuestro archivo de Log (Debian y derivados)
+SECURE_LOG = /var/log/auth.log
+
+# Lugar donde se encuentra nuestro archivo de bloqueo de hosts
+HOSTS_DENY = /etc/hosts.deny
+
+# El periodo en el que la IP va a ser eliminada de la lista de bloqueo, puede ser en hora (h), dias (d)...
+PURGE_DENY = 72h
+
+# Cual servicio queremos que sea bloqueado, puede ser sshd, o ALL para todos
+BLOCK_SERVICE = ALL
+
+# Numero de veces de error cuando se ingresa con un usuario NO existente 
+# Se supone que el root conoce a sus usuarios y no debe de equivocarse
+DENY_THRESHOLD_INVALID = 2
+
+# Numero de veces de error con un usuario SI existente en el sistema
+DENY_THRESHOLD_VALID = 10
+
+# Numero de veces de error con el usuario ROOT
+DENY_THRESHOLD_ROOT = 2
+DENY_THRESHOLD_RESTRICTED = 1
+WORK_DIR = /var/lib/denyhosts
+
+# Reportar entradas sospechosas
+SUSPICIOUS_LOGIN_REPORT_ALLOWED_HOSTS=YES
+
+# Buscar el nombre del host del atacante si este esta disponible
+HOSTNAME_LOOKUP=YES
+LOCK_FILE = /var/run/denyhosts.pid
+
+# Email para notificar los bloqueos
+ADMIN_EMAIL = alert@viserproyect.com
+SMTP_HOST = localhost
+SMTP_PORT = 25
+SMTP_FROM = DenyHosts 
+SMTP_SUBJECT = DenyHosts Reporte
+SMTP_DATE_FORMAT = %a, %d %b %Y %H:%M:%S %z
+AGE_RESET_VALID=5d
+AGE_RESET_ROOT=25d
+AGE_RESET_RESTRICTED=25d
+AGE_RESET_INVALID=10d
+DAEMON_LOG = /var/log/denyhosts
+DAEMON_SLEEP = 30s
+DAEMON_PURGE = 1h
+
+Guardar y arrancamos el servicio
+
+service denyhosts start
+
+
+

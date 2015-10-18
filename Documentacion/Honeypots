@@ -1,0 +1,295 @@
+AUN SIN FORMATO
+
+Documentación Máquina ViSeR HONEYPOTS 
+
+Consideraciones Generales: 
+
+El papel de la tecnología del sistema de detección de intrusos basado en señuelos o "honeypots" está evolucionando. Los honeypots, que alguna vez fueron utilizados principalmente por los investigadores como una forma de atraer a los hackers o a los piratas informáticos a un sistema de redes para estudiar sus movimientos y comportamiento, están adquiriendo una importancia cada vez mayor en la seguridad empresarial. En efecto, al brindar detección temprana de actividad no autorizada en las redes, los honeypots son ahora más útiles que nunca para los profesionales de seguridad de TI.
+
+Los Honeypots (Potes de miel) “Consisten en activar un servidor y llenarlo de archivos tentadores, hacer que sea difícil, pero no imposible penetrarlo y sentarse a esperar que aparezcan los intrusos.
+
+La función principal a parte de la de estudiar las herramientas de ataque, es la de desviar la atención del atacante de la red real del sistema o la de capturar nuevos virus o gusanos para su posterior estudio. Una de las múltiples aplicaciones que tiene es la de poder formar perfiles de atacantes y ataques.
+
+Son una herramienta muy útil a la hora de conocer de forma precisa los ataques que se realizan contra la plataforma de trabajo que hemos elegido.
+
+Entre sus ventajas:
+
+Los honeypots son un concepto increíblemente simple, las cuales ofrecen una fortaleza muy poderosa 
+
+* Conjunto de datos pequeños pero de gran importancia: Los Honeypots recolectan pequeñas cantidades de información. En lugar de loguear 1 Gb por día, loguean sólo 1 Mb de datos por día. En vez de generar 10.000 alertas por día, pueden generar sólo 10 alertas por día. Recuerden, los honeypots sólo capturan actividad sospechosa ya que cualquier interacción con un honeypot es muy probablemente actividad no autorizada o una actividad maliciosa. Propiamente dicho, los honeypots reducen el "ruido" recogiendo sólo datos indispensables, de gran valor, los producidos únicamente por "chicos malos". Esto significa que es mucho más fácil (y barato) de analizar los datos que un honeypot recoge. 
+ * Nuevas herramientas y tácticas: Los honeypots son diseñados para capturar cualquier cosa que interactúa con él, incluyendo herramientas o tácticas nunca vistas.
+ * Mínimos recursos: Los honeypots requieren mínimos recursos, sólo capturan actividad irregular. Esto significa que un viejo Pentium con 256 mb de RAM puede manejar fácilmente una entera red clase B en una red OC-12. 
+ * Cifrado o IPv6: A diferencia de la mayoría de las tecnologías para la seguridad, como los sistemas IDS, honeypots trabajan bien en entornos cifrados como IPv6. No importa lo que los "chicos malos" lancen hacia el honeypot, el honeypot lo detectará y lo capturará. 
+ * Información: Los honeypots pueden recoger información "en profundidad" como pocos, si es que existen tecnologías que se le parezcan. 
+ * Simplicidad: Finalmente, los honeypots son conceptualmente simples. No hay por qué desarrollar algoritmos raros, ni complejas tablas que mantener, o firmas que actualizar. Mientras más simple sea la tecnología, menos posibilidades de errores o desconfiguraciones habrá.
+
+Además debemos tener en cuenta que:
+
+No existe la seguridad total en ningún sistema
+Cuanto antes detectemos los incidentes, mejor podremos solventar el problema
+Los sistemas IDS presentan un alto porcentaje de falsos positivos.
+
+En esta oportunidad emplearemos varios Honeypots dos (02), conforme a sus características, que son expuestas en sus sitios web .
+
+Honeypots HLBR (http://hlbr.sourceforge.net)
+
+HLBR es un IPS (Intrusion Prevention System, Sistema de prevención de intrusiones) capaz de filtrar paquetes directamente en la capa 2 del modelo OSI (por lo tanto la computadora no necesita siquiera una dirección IP). La detección de tráfico malicioso/anómalo se realiza a través de reglas simples, (El usuario mismo podrá configurar nuevas reglas). Es eficiente y versátil, incluso puede ser usado como puente a honeypots y honeynets. Como no usa el protocolo TCP/IP del sistema operativo, puede ser "invisible" a otras computadoras en la red y a los atacantes.
+
+HLBR viene con un conjunto de reglas para detectar el tráfico de red malicioso conocido, y puede definir sus propias reglas también. Manejo de paquetes incluyen opciones como:
+ - Dejar caer o desviarlo a otro equipo (como un honeypot). Ya que funciona como un puente y no requiere una dirección IP, que es invisibles a los intrusos.
+ - HLBR soporta reglas para expresiones regulares (Perl).
+ - Todo el tráfico bloqueado se vierten en el registro bajo formato tcpdump.
+
+LABREA (http://labrea.sourceforge.net)
+
+LaBrea se hace cargo de las direcciones IP no utilizadas dentro de una red y genera "máquinas virtuales" que responden a los intentos fallidos de conexión. LaBrea responde a estos intentos de conexión de una manera que hace que la máquina en el otro extremo crea haber "atrapado" algo, a veces durante mucho tiempo.
+
+LaBrea trabaja observando peticiones y respuestas ARP. Cuando el pgm ve peticiones ARP consecutivos espaciados varios segundos de diferencia, sin
+ ninguna respuesta ARP interviene, asume que la dirección IP en cuestión esta desocupada. A continuación, "crea" una respuesta ARP con una dirección MAC falsa,
+ y envía información "falsa" de nuevo al solicitante.
+
+Ahora, LaBrea también mira el tráfico TCP destinado para la dirección de éter 0:0: f: ff: ff: ff. Cuando ve un paquete TCP SYN entrante, responde con un paquete SYN/ACK que "atrapa" el intento de conexión. Todo lo demás es ignorado. (Bueno. .. más o menos. LaBrea también trata de dar a sus "máquinas virtuales" algunos personajes ... se puede hacer ping a ellos, y que responde a un SYN/ACK con un RST).
+
+Es bastante fácil de configurar.
+
+Nota: La máquina honeypot está fuera del entorno en una red independiente y es manipulada por la máquina Gestión
+
+Procedamos a la instalación y configuración
+
+Procedemos a realizar algunos cambios en el firewall (cortafuegos) de la máquina
+
+Creamos el siguiente archivo:
+
+- nano firewall.sh
+
+Y añadimos este contenido
+
+	#!/bin/bash
+
+	 # Optimizado para las HoneyPots
+	 # Borrar todas las reglas
+
+	 iptables -F 
+
+	 # Politica general. Cerramos todo.Dejamos entrar y salir lo solicitado
+
+	 iptables -P INPUT DROP
+	 iptables -P OUTPUT ACCEPT
+	 iptables -P FORWARD DROP
+	 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+	 iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+	# Intenta prevenir SYN floods
+	echo "1" > /proc/sys/net/ipv4/tcp_syncookies
+
+	 # Asegurar, aunque no tenga soporte el nucleo, q no hay forward.
+
+	 /bin/echo "0" > /proc/sys/net/ipv4/ip_forward
+
+	 ### Reglas de los puertos ####
+
+	 # Permitimos que se conecten a nuestro servidor web. 
+
+	 iptables -A INPUT -m state --state NEW -p TCP --dport 80 -j ACCEPT
+	 iptables -A INPUT  -i $IFACE -p tcp --sport 80 -m state --state ESTABLISHED -j ACCEPT
+	 iptables -A OUTPUT -o $IFACE -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+	 # 443.
+
+	 iptables -A INPUT  -i $IFACE -p tcp --sport 443 -m state --state ESTABLISHED -j ACCEPT
+	 iptables -A OUTPUT -o $IFACE -p tcp --dport 443 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+	 # 8880.
+
+	 iptables -A INPUT -p tcp --dport 8080 -j ACCEPT
+
+	  # Permitimos la comunicación con el servidor ssh
+	 
+	  iptables -A INPUT -p TCP --dport 22 -j ACCEPT
+	  iptables -A INPUT  -i $IFACE -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT 
+	  iptables -A OUTPUT -o $IFACE -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT 
+          iptables -A INPUT -p tcp -m tcp --dport 22 -j LOG --log-prefix 'INTENTO DE ACCESO A SSH ' --log-level 4
+
+	 #Permitimos uso de ftp.
+
+	 iptables -A INPUT -p TCP --dport 21 -j ACCEPT 
+         iptables -A INPUT -p tcp -m tcp --dport 21 -j LOG --log-prefix 'INTENTO DE ACCESO A FTP ' --log-level 4
+
+	 #Permitimos acceso pop3.
+
+	 iptables -A INPUT -p TCP --dport 110 -j ACCEPT
+         iptables -A INPUT -p tcp -m tcp --dport 110 -j LOG --log-prefix 'INTENTO DE ACCESO A POP3 ' --log-level 4
+
+	 # Permitimos uso de smtp
+
+	 iptables -A INPUT -p TCP --dport 25 -j ACCEPT
+	 iptables -A INPUT  -i $IFACE -p tcp --sport 25 -m state --state ESTABLISHED -j ACCEPT
+	 iptables -A OUTPUT -o $IFACE -p tcp --dport 25 -m state --state NEW,ESTABLISHED -j ACCEPT
+         iptables -A INPUT -p tcp -m tcp --dport 25 -j LOG --log-prefix 'INTENTO DE ACCESO A SMPT ' --log-level 4
+
+	 #Permitimos acceso imap.
+
+	 iptables -A INPUT -p TCP --dport 143 -j ACCEPT
+	 iptables -A INPUT -p UDP --dport 143 -j ACCEPT
+         iptables -A INPUT -p tcp -m tcp --dport 21 -j LOG --log-prefix 'INTENTO DE ACCESO A IMAP ' --log-level 4
+
+	 #Permitimos todo el trafico de la LAN
+
+	 iptables -A INPUT -s 192.168.1.0/24 -j ACCEPT
+
+	 #Dejamos a localhost, para mysql, etc..
+
+	 iptables -A INPUT -i lo -j ACCEPT
+
+	# PROTECCIÓN SSYN-FLOODING  -- Solo para hacerlo más creible 
+	# Esta regla se maximiza la tasa de conexiones entrantes. 
+	# Con el fin de hacer esto desviamos paquetes tcp 
+	# con el bit SYN se lanzó a # una cadena definida por el usuario. Hasta conexiones limit-burst 
+	# puede llegar en cuestión de segundos 1/limit - en este caso 5 conexiones en un segundo. 
+	# Después de esto, uno de la explosión se recuperaron cada segundo y las conexiones se permite de nuevo.
+	# El límite predeterminado es 3/hora. El límite predeterminado es 5.
+
+	iptables -N syn-flood
+	iptables -A INPUT -i $IFACE -p tcp --syn -j syn-flood
+	iptables -A syn-flood -m limit --limit 1/s --limit-burst 5 -j RETURN
+	iptables -A syn-flood -j DROP
+
+	# Asegurar de que las nuevas conexiones TCP son paquetes SYN
+
+	iptables -A INPUT -i $IFACE -p tcp ! --syn -m state --state NEW -j DROP
+
+	# Fin script
+
+- Guardamos 
+
+Le damos permiso de ejecución
+
+- chmod +x firewall.sh
+
+Ejecutamos
+
+- sh firewall.sh
+
+Vemos como quedó
+
+- iptables -L
+
+- Copiamos el script en /etc/init.d y lo ponemos por default:
+
+- cp firewall.sh /etc/init.d/
+- update-rc.d firewall.sh defaults
+
+Recuerde que todo lo que ocurra será almacenado en:
+
+/var/log/syslog
+
+Para leerlo:
+- tail -f /var/log/syslog
+
+Para guardar solo la de IPTABLES en un log, editamos:
+
+- nano /etc/rsyslog.d/50-default.conf
+
+Y al final añadimos
+
+#iptables Log
+kern.*    /var/log/firewall.log
+
+
+Instalación:
+
+- apt-get install labrea
+- apt-get install hlbr
+
+
+Explicación:
+
+LABREA Honeypots:
+
+Usa la(s) IP de una red que están no se están usando, representando varias máquinas con los servicios necesarios. Estas máquinas se encargan de responder a los intentos de conexión que se realizan, con el propósito de que la máquina investigadora se queda mucho tiempo entretenida con las máquinas investigadas. 
+
+LABREA vigila el tráfico ARP de la máquina en la que se ejecuta, y conforme a un tiempo prudencial después de una petición ARP, ésta no es resuelta, LABREA crea una dirección MAC falsa asignandole una IP. Desde este mismo momento, ya tenemos una máquina simulada creada, y podemos tener tantas como IP libres tengamos en nuestro rango previamente establecido. La máquina "simulada" creada vigilará el tráfico TCP a ella dirigido, y responderá a las peticiones que se le hagan de forma limitada.
+
+Para su uso debemos configurar las preferencias tales como:
+
+Direcciones IP que no deben ser capturadas núnca por LaBrea, por ejemplo, porque ya hay máquinas con esa IP (con la sintaxis x.x.x.x-y.y.y.y EXC para rangos).
+Direcciones IP que no deben ser ''hard-captured' (capturadas permanentemente) núnca (con sintaxis x.x.x.x HAR).
+Direcciones IP de las cuales queramos ignorar paquetes, por ejemplo, de máquinas nuestras (con sintaxis x.x.x.x/y IPI para rangos).
+Puertos a ignorar (no habrá tarpitting ni captura en ellos), (con sintaxis x-y POR para rangos).
+Puertos a vigilar (esta vez si tendran las anteriores atenciones), (con sintaxis x-y PMN para rangos).
+
+Más información en: http://labrea.sourceforge.net/README 
+
+La ayuda de la aplicación muestra:
+
+Usage: LaBrea <options> <BPF filter>
+Options:
+--device (-i) interface : Set a non-default interface
+--foreground (-d)       : Do NOT detach process
+
+labrea: --bpf-file (-F) filename : Specify a BPF filter filename
+--network (-n) nnn.nnn.nnn.nnn[/mm] : User specified capture subnet
+--mask (-m) nnn.nnn.nnn.nnn	: User specified capture subnet mask
+--throttle-size (-t) datasize : Connection throttling size (bytes)
+--arp-timeout (-r) rate	: Arp timeout rate (seconds)
+--switch-safe (-s)      : "Safe" operation in a switched environment
+--log-to-syslog (-l)    : Log activity to syslog
+--verbose (-v)          : Verbosely log activity
+--init-file filename    : Specify alternative config file
+--hard-capture (-h)     : "Hard" capture IPs
+--disable-capture (-x)  : Disable IP capture
+--version (-V)          : Print version information and exit
+--no-resp-synack (-a)   : Do not respond to SYN/ACKs and PINGs
+--quiet (-q)            : Do not report odd (out of netblock) ARPs
+--dry-run (-T)          : Test mode - Prints out messages but DOES NOT RUN
+--soft-restart (-R)     : Soft restart - Wait while recapturing active connects
+--max-rate (-p) maxrate : "Persist" state capture connect attempts up to Kb/sec
+--persist-mode-only (-P): Persist mode capture only
+--log-bandwidth (-b)    : Log bandwidth usage to syslog
+--log-to-stdout (-o)    : Output to stdout instead of syslog, implies -d
+--log-timestamp-epoch  (-O) : Same as -o w/time output in seconds since epoch
+--exclude-resolvable-ips (-X) : Automatically exclude resolvable IPs from capture
+--auto-hard-capture (-H) : Automatically hard capture addresses not excluded
+--no-resp-excluded-ports (-f) : "Firewall" excluded ports
+--no-arp-sweep          : Do not arp sweep subnet for occupied IPs
+--my-ip-addr (-I) ipaddr : IP address of this system
+--my-mac-addr (-E) macaddr : MAC address of this system
+--debug nnn             : Debug output for debug levels nnn (requires compile option)
+--no-nag (-z)           : Allow execution and bypass nag reminder
+--help --usage (-?)     : This message
+
+El archivo de configuración esta ubicado en:
+
+/etc/labrea/labrea.conf
+
+En un documento de http://enchufado.com/post.php?ID=42 explican de forma sencilla el uso:
+
+Antes de ejecutarlo prepararemos una instancia de tcpdump para volcar el tráfico ARP a la pantalla, analizarlo y ver cómo actúa LaBrea generando la MAC falsa. Una invocación sería tal que:
+
+tcpdump -q -p -i eth0 arp
+
+Dejamos ejecutando esto por un lado en una terminal, y no debería producir demasiada información. Sólo cabe destacar que quizás el router, al tener configurado un DMZ cuya IP se desconoce hasta el momento, vaya haciendo sucesivos requests de ARP acerca de la MAC de dicha IP con ansias de conocerla.
+
+Por otro lado procedemos a ejecutar LaBrea:
+
+labrea -z -s -o -b -p 10000 -i eth0 -v -a -h
+
+Sin el parámetro -z no podremos usarlo. Esto parece ser puramente una prevención para no usar el programa sin conocer de los riesgos que comporta su uso (en la FAQ advierten que puede cargarse cosas en una red; apuesto a que habla de determinados servicios). El parámetro -s es para asegurarse de que una IP no está siendo usada en un entorno de varios switches, donde el host que ejecuta LaBrea puede no conocer todo el tráfico que circula por el switch. Con -o indicamos que queremos redirigir la salida a stdout, lo cual implica que el proceso quede 'enganchado' a la terminal donde se ejecuta. Con -b logueamos, minuto a minuto, el consumo del ancho de banda de la siguiente opción: -p, que significa el máximo del ancho de banda (en Bytes/s) que le queremos dedicar a LaBrea para la captura de intentos de conexión (si sobrepasa el límite, aún y sin capturar ese excedente, sigue ejerciendo su labor de frenar -tarpit- estos intentos). Con -i le indicamos la interfaz en la que la aplicación debe escuchar. Con -v aumentamos la 'verbosidad' del programa (y aún más con -vv). Con -h hacemos una 'hard-capture' de una IP; una vez que se captura una IP para ser usada como sistema simulado, se retiene permanentemente sin atender a timeouts de consultas ARP. Con -a podríamos cambiar el modo de actuación por defecto de la aplicación, que supone responder a los intentos de conexión (SYN/ACK) con RST, y responder a los pings.
+
+Hecho esto, la aplicación empezará a monitorizar su inicialización y posteriores acciones por la terminal. En mi caso, es mi propio router quien activa el honeypot por su afán de conocer al poseedor de la IP del DMZ inexistente. En este momento, por consola deberíamos ver cómo LaBrea genera la "bogus MAC", con una dirección tal que 00:00:0f:ff:ff:ff. Ahora mi router ya sabe a quién mandarle las peticiones que recibe desde Internet.
+
+A partir de este momento, LaBrea va registrando sucesivas conexiones a diferentes puertos. En este caso, se trata de los puertos 135 (localizador de servicios tales como DHCP, DNS y WINS, aka loc-srv/epmap), 445 (SMB de NT5 ó superiores, aka microsoft-ds), 6883 (bittottent) y 31614 (¿?). 
+
+Los mensajes:Interesantes son l
+"Additional Activity" y "Persist Activity", que se refieren al inicio o mantenimiento, respectivamente, de una conexión que simula cerrada y a la espera de podérsela abrir al que trata de conectar. Se le mantiene ocupado diciéndole periódicamente (hasta un máximo del bitrate indicado por -p) que se espere.
+
+"Initial Connect - tarpitting" y "Persist Trapping", que se refieren a que nuestro sistema simulado hace ver que inicia o mantiene, respectivamente, una comunicación producto de la demanda del sistema que trata de conectarnos, y dicho sistema trata infructuosamente de continuarla.
+
+Para otras configuraciones, en el sitio web del projecto: http://labrea.sourceforge.net/labrea.conf.5.txt
+
+
+
+
+
+
+

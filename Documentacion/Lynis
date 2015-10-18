@@ -1,0 +1,75 @@
+Lynis
+
+Lynis es una herramienta que ayuda a detectar problemas de configuración que pueden ser aprovechadas para atacar nuestro sistema. usualmente se combina con Rkhunter y chkrootkit
+
+Cuando escaneamos nuestro sistema con Lynis, se realizará una auditoría que abarca diferentes categorías entre las que podemos nombrar:
+
+AppArmor, SELinux, grsecurity
+Almacenamiento
+Aplicaciones Instaladas
+Base de Datos
+Booteo y Servicios
+Correo y mensajería
+DNS
+Herramientas del Sistema
+Kernel
+Malware
+LDAP
+PHP
+Procesos y memoria
+Usuarios, Grupos y metodos de autenticación
+Sistema de Archivos
+Servicios de Nombre: DNS, Bind
+Puertos
+Paquetes
+Servicios de Red
+Servicios de Impresión
+SNMP
+Squid
+SSH
+Virtualización
+
+Entre otras...
+
+El reporte de auditoría nos dara avisos de vulneraribilidades encontradas en nuestro sistema. Tambien nos dará tips para reforzar la seguridad,
+
+
+Instalación y configuración
+
+sudo su
+
+aptitude install lynis
+
+Actualizamos
+
+lynis --check-update
+
+Chequeamos nuestro sistema
+
+lynis --check-all -Q
+
+Tambien podemos usar:
+
+lynis -c
+
+
+La información generada se almacenará en /var/log/lynis.log 
+
+para leerlo:
+
+nano /var/log/lynis.log
+
+Para filtrar la vista solo para las sugerencias:
+
+grep Suggestion /var/log/lynis.log
+
+
+
+Sitio oficial del proyecto:
+http://www.rootkit.nl/projects/lynis.html
+
+Documentación:
+http://www.rootkit.nl/files/lynis-documentation.html
+
+
+MAN: http://manpages.ubuntu.com/manpages/precise/man8/lynis.8.html 

@@ -1,0 +1,102 @@
+Detector de rootkit /  chkrootkit - Rkhunter
+
+Un rootkit es una herramienta, o un grupo de ellas que tiene como finalidad esconderse a sí misma y esconder a otros programas, procesos, archivos, directorios, llaves de registro, y puertos que permiten al intruso mantener el acceso a un sistema para remotamente comandar acciones o extraer información sensible, a menudo con fines maliciosos o destructivos. Existen rootkits para una amplia variedad de sistemas operativos.
+
+Instalación y Configuración
+
+Ambos programas necesitar permisos 'root' para poder ser ejecutados
+
+chkrootkit 
+Sitio web chkrootkit: http://www.chkrootkit.org/download.htm
+
+apt-get install chkrootkit
+
+Editamos el archivo de configuración:
+
+nano /etc/chkrootkit.conf
+
+cambiamos:
+
+ RUN_DAILY="false"
+
+por
+
+ RUN_DAILY="true"
+
+guardamos
+
+Sí desea recibir las notificaciones:
+
+Editamos: 
+
+nano /etc/cron.daily/chkrootkit 
+
+y cambiamos aproximadamente en la línea 49
+
+'$CHKROOTKIT $RUN_DAILY_OPTS' 
+
+por
+
+'$CHKROOTKIT $RUN_DAILY_OPTS | mail -s '"\"Diario de chkrootkit de $HOSTNAME \"$TU_EMAIL"'
+
+
+y guardamos
+
+
+Rkhunter
+
+apt-get install rkhunter
+
+Una vez instalado podemos ejecutarlo:
+
+
+sudo rkhunter --check 
+
+o
+
+sudo rkhunter -c 
+
+Para actualizar su lista de busqueda por nuevos rootkits
+
+sudo rkhunter --update
+
+Editamos el fichero de configuración:
+
+nano etc/rkhunter.conf
+
+Sí deseas recibir las notificaciones modificas:
+
+MAIL-ON-WARNING=""
+
+colocando entre las comillas tu dirección email
+
+Guardas
+
+Para más información de la linea de comando:
+
+rkhunter --help
+
+rkhunter -h
+
+Actualización:
+
+rkhunter --update && rkhunter --propupd
+
+nano /etc/cron.weekly/rkhunter.sh
+
+
+#!/bin/sh
+(
+ /usr/bin/rkhunter --versioncheck
+ /usr/bin/rkhunter --update
+ /usr/bin/rkhunter --propupd
+ /usr/bin/rkhunter --cronjob --report-warnings-only
+) | /bin/mail -s 'rkhunter Weekly Run (base.phenobarbial.info)' admin@phenobarbital.info
+
+ 
+
+chmod +x /etc/cron.weekly/rkhunter.sh
+
+
+
+

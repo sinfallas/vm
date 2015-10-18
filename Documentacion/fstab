@@ -1,0 +1,51 @@
+fstab 
+
+El fichero fstab (file systems table) esta ubicado en  /etc/ como parte de la configuración del sistema. La estructura de las instrucciones es de 6 columnas separadas por espacios o tabuladores, su formato es:
+
+<dispositivo> <punto_de_montaje> <sistema_de_archivos> <opciones> <dump-freq> <pass-num>
+
+Significado:
+
+<dispositivo> es el directorio lógico que hace referencia a una partición o recurso.
+
+<punto_de_montaje> es la carpeta en que se proyectarán los datos del sistema de archivos.
+
+<sistema de archivos> es el algoritmo que se utilizará para interpretarlo.
+
+<opciones> es el lugar donde se especifican los parámetros que mount utilizará para montado el dispositivo, deben estar separadas por comas.
+
+<dump-freq> es el comando que utiliza dump para hacer respaldos del sistema de archivos, si es 0 no se toma en cuenta ese dispositivo.
+
+<pass-num> indica el orden en que la aplicación fsck revisará la partición en busca de errores durante el inicio, si es 0 el dispositivo no se revisa.
+
+
+Para mejorar la seguridad de nuestro sistama editamos el archivo /etc/fstab
+
+sudo su
+
+nano /etc/fstab
+
+Agregamos o editamos las siguientes líneas:
+
+#
+# Colocamos los tmp en la RAM de esa forma al reset queda limpio, aunque tambien podemos vaciar manualmente
+# Si el sistema necesita algo del tmp lo recuperará mucho más rápido que leerlo en disco
+#
+
+tmpfs /var/tmp tmpfs defaults,noatime,nodev 0 0
+tmpfs /tmp     tmpfs defaults,noatime,nodev 0 0
+
+#
+# Securizamos la memoria compartida
+#
+
+tmpfs  /dev/shm   tmpfs  defaults,noexec,nosuid 0 0
+
+
+Guardamos
+
+Reiniciamos
+
+reboot
+
+

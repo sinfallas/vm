@@ -1,0 +1,832 @@
+Documentación Máquina ViSeR WEB 
+Consideraciones Generales:
+Servicio Web - Apache.
+
+Apache es el servidor web hecho por excelencia, su configurabilidad, robustez y estabilidad hacen que cada vez millones de servidores reiteren su confianza en este programa y ViSeR no podía ser la excepción.
+
+Cabe destacar que la licencia Apache es una descendiente de la licencias BSD, no es GPL. Esta licencia permite hacer lo que desees con el código fuente (incluso forks y productos propietarios) siempre que les reconozcas su trabajo.
+
+Entre los características que tenemos en cuenta para usar Apache en ViSeR están:
+Corre en diversos Sistemas Operativos.
+Apache es una tecnología gratuita de código fuente abierto.
+
+El servidor consta de una sección core y diversos módulos que aportan mucha de la funcionalidad que podría considerarse básica para un servidor web. Algunos de estos módulos son:
+mod_ssl - Comunicaciones Seguras vía TLS.
+mod_rewrite - reescritura de direcciones.
+mod_dav - Soporte del protocolo WebDAV (RFC 2518).
+mod_deflate - Compresión transparente con el algoritmo deflate del contenido enviado al cliente.
+mod_auth_ldap - Permite autentificar usuarios contra un servidor LDAP.
+mod_proxy_ajp - Conector para enlazar con el servidor Jakarta Tomcat de páginas dinámicas en Java (servlets y JSP).
+El servidor de base puede ser extendido con la inclusión de módulos externos entre los cuales se encuentran:
+mod_cband - Control de tráfico y limitador de ancho de banda.
+mod_perl - Páginas dinámicas en Perl.
+mod_php - Páginas dinámicas en PHP.
+mod_python - Páginas dinámicas en Python.
+mod_rexx - Páginas dinámicas en REXX y Object REXX.
+mod_ruby - Páginas dinámicas en Ruby.
+mod_mono - Páginas dinámicas en Mono
+mod_security - Filtrado a nivel de aplicación, para seguridad
+Apache trabaja con gran cantidad de Perl, PHP, Phyton y otros lenguajes de script.
+Una alta configurabilidad en la creación y gestión de logs.
+Al ser de código abierto al encontrarse una vulnerabilidad en pocas horas es solucionada.
+Actualmente Apache, según netcraft.com (Abril 2013 ) Apache corre en el 55.07% de todos los servidores en el mundo.
+Servicio de Base de datos - MySQL
+
+MySQL es un sistema de gestión de bases de datos relacional con más de ocho millones de instalaciones. Posee doble licenciamiento, una parte privativa (la mayor parte) y otra parte con licenciamiento GNU GPL.
+
+MySQL es muy utilizado en aplicaciones web, y puede ser usado casi todas las plataformas. MySQL es una base de datos muy rápida, aunque no posee la robustes de PostgerSQL, realizando algunos cambios en la configuración inicial puede tornarse robusta y eficiente.
+
+Entre sus caraterísticas podemos mencionar:
+Usa GNU Automake, Autoconf, y Libtool para portabilidad
+Uso de multihilos mediante hilos del kernel.
+Usa tablas en disco b-tree para búsquedas rápidas con compresión de índice
+Tablas hash en memoria temporales
+El código MySQL se prueba con Purify (un detector de memoria perdida comercial) así como con Valgrind, una herramienta GPL.
+Completo soporte para operadores y funciones en cláusulas select y where.
+Completo soporte para cláusulas group by y order by, soporte de funciones de agrupación
+Seguridad: ofrece un sistema de contraseñas y privilegios seguro mediante verificación basada en el host y el tráfico de contraseñas está cifrado al conectarse a un servidor.
+Soporta gran cantidad de datos. MySQL Server tiene bases de datos de hasta 50 millones de registros.
+Se permiten hasta 64 índices por tabla. Cada índice puede consistir desde 1 hasta 16 columnas o partes de columnas. El máximo ancho de límite son 1000 bytes.
+Los clientes se conectan al servidor MySQL usando sockets TCP/IP en cualquier plataforma. En sistemas Unix se pueden conectar usando ficheros socket Unix.
+En MySQL 5.0, los clientes y servidores Windows se pueden conectar usando memoria compartida.
+MySQL contiene su propio paquete de pruebas de rendimiento proporcionado con el código fuente de la distribución de MySQL.
+Replicación.
+Lenguaje de programación - PHP
+
+PHP es un lenguaje de programación de uso general de código del lado del servidor originalmente diseñado para el desarrollo web de contenido dinámico. Fue publicado bajo la licencia PHP que es incompatible con la Licencia Pública General de GNU.
+
+Es conseguido en la totalidad de los servidores web y en casi todos los sistemas operativos y plataformas sin costo alguno. Es usado por los principales portales y aplicaciones web. Según datos proporcionados por Zend en Mayo 2013 existen 244 millones de sitios web que emplean PHP
+
+Entre sus características:
+Mejor soporte para la programación orientada a objetos.
+Mejor soporte a XML (XPath, DOM, etc.).
+Soporte nativo para SQLite.
+Soporte integrado para SOAP.
+Iteradores de datos.
+Manejo de excepciones.
+Mejoras con la implementación con Oracle.
+Puede trabajar con la gran mayoría de los gestores de base de datos (ejemplo: MySQL, PostgerSQL)
+
+OpenSSL.
+
+OpenSSL es una implementación libre, de código abierto, de los protocolos SSL (Secure Sockets Layer o Nivel de Zócalo Seguro) y TLS (Transport Layer Security o Seguridad para Nivel de Transporte). Está basado sobre el extinto proyecto SSLeay.
+
+INSTALACION
+Instalación Apache - MySQL - PHP
+
+Toda la instalación se hará usando la consola de comandos.
+
+- sudo su (introduzca la clave root)
+
+Usaremos apt-get, pero si posee instalado aptitude también puede usarlo
+
+- apt-get install apache2
+- apt-get install php5 libapache2-mod-php5 php5-cli php5-mysql php5-cgi
+- apt-get install mysql-server mysql-client libmysqlclient-dev
+
+Sí prefiere y de una forma automática podemos instalar todo de la siguiente forma, tasksel lo guiará en el proceso:
+
+- apt-get install tasksel
+- tasksel install lamp-server
+
+Ahora procederemos con los demás pasos:
+
+- apt-get install libapache2-mod-auth-mysql libapache2-mod-fcgid
+- apt-get install apache2-utils
+- apt-get install libapache2-mod-perl2
+- apt-get install libxml2 libxml2-dev libxml2-utils
+- apt-get install libaprutil1 libaprutil1-dev
+- apt-get install libapache-mod-security libapache2-mod-evasive
+- apt-get install phpmyadmin memcached php5-memcache
+- apt-get install php5-curl php5-gd
+- apt-get install php5-geoip php5-suhosin php5-cli
+- apt-get install php5-idn php5-pspell php5-snmp
+- apt-get install php5-recode php5-imagic php5-ming
+- apt-get install libapache2-mod-python
+- apt-get php pear socket
+
+Los MOD:
+
+- a2enmod php5
+- a2enmod auth_mysql
+- a2enmod headers
+- a2enmod rewrite
+- a2dismod expires
+- a2enmod deflate
+- a2enmod cache
+- a2enmod cache
+- a2enmod mem_cache
+- a2enmod proxy
+- a2enmod proxy_balancer
+- a2enmod proxy_http
+- a2enmod status
+
+- Hacemos una copia del php.ini
+
+sudo mv /etc/php5/apache2/php.ini /etc/php5/apache2/php.ini.bak
+
+- Editar y añadir en el archivo deflate.conf:
+
+- nano /etc/apache2/mods-enabled/deflate.conf
+
+AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/x-javascript application/javascript application/ecmascript application/rss+xml text/x-js
+BrowserMatch ^Mozilla/4 gzip-only-text/html
+BrowserMatch ^Mozilla/4\.0[678] no-gzip
+BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+- Guardar
+
+- Limpiamos:
+
+- htcacheclean -d30 -n -t -p /var/cache/apache2/mod_disk_cache -l 100M -i
+
+- Editar y añadir sino esta:
+
+- nano etc/apache2/mods-available/mem_cache.conf
+
+<IfModule mod_mem_cache.c>
+
+CacheEnable mem /
+MCacheSize 4096
+MCacheMaxObjectCount 100
+MCacheMinObjectSize 1
+MCacheMaxObjectSize 2048
+
+</IfModule>
+
+- Guardar
+
+Seguimos:
+
+- ln -s /usr/lib/x86_64-linux-gnu/libxml2.so.2 /usr/lib/libxml2.so.2
+- mv /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+
+Editamos:
+
+- nano /etc/modsecurity/modsecurity.conf
+
+- Activar
+
+SecRuleEngine On
+
+- Editar
+
+SecRequestBodyLimit 16384000
+SecRequestBodyInMemoryLimit 16384000
+
+- Guardar
+
+Ejecutamos:
+
+- a2enmod mod-security
+- mkdir /var/log/mod_evasive
+- chown www-data:www-data /var/log/mod_evasive/
+
+- Creamos el archivo mod-evasive.conf
+
+- nano /etc/apache2/mods-available/mod-evasive.conf
+
+- Añadir:
+
+<ifmodule mod_evasive20.c>
+
+DOSHashTableSize 3097
+DOSPageCount 2
+DOSSiteCount 50
+DOSPageInterval 1
+DOSSiteInterval 1
+DOSBlockingPeriod 10
+DOSLogDir /var/log/mod_evasive
+DOSEmailNotify EMAIL@DOMAIN.com
+DOSWhitelist 127.0.0.1
+
+</ifmodule>
+
+- Guardar
+
+Activamos los módulos
+
+- a2enmod mod-evasive
+- a2dismod php
+- apache2-mpm-worker
+
+- Editamos
+
+- nano /etc/apache2/apache2.conf
+
+# Agregamos las siguientes líneas al final del archivo
+
+AddHandler cgi-script .cgi
+
+<Files ~ “\.pl$”>
+
+Options +ExecCGI
+
+</Files>
+
+<Files ~ “\.cgi$”>
+
+Options +ExecCGI
+
+</Files>
+
+#Securizar
+
+
+- Guardamos
+
+- Añadir en el archivo httpd.conf
+
+- nano /etc/apache2/http.conf
+
+<Location />
+
+AddHandler fcgid-script .php
+Options +ExecCGI
+FcgidWrapper /usr/bin/php-cgi .php
+
+</Location>
+
+- Guardar
+
+Editamos ahora para evitar caracteres extraños:
+
+nano /etc/apache2/conf.d/carhset
+
+y añadimos:
+
+AddDefaultCharset UTF-8
+AddDefaultCharset latin1
+Guardamos
+
+
+Restricciones en Información de Apache
+
+Editamos el archivo /etc/apache2/conf.d/security
+
+sudo su
+
+nano /etc/apache2/conf.d/security
+
+Cambiamos o agregamos:
+
+# Por default viene en ServerTokens OS
+
+ServerTokens Prod
+
+# Por default viene en ServerSignature On
+
+ServerSignature Off
+
+# Por default viene en TraceEnable On
+
+TraceEnable Off
+
+# anti clickhacking 
+
+Header always append X-Frame-Options SAMEORIGIN
+
+# X-XSS Protection
+
+Header set X-XSS-Protection “1; mode=block”
+
+# Estas hay que agregarlas al final
+
+FileETag None
+
+Guardamos
+
+Levantamos los servicios
+
+- service apache2 start
+- service mysql start
+
+Continuamos:
+
+- apache2ctl -M
+
+- Procederemos a instalar SPDY
+** con SPDY se debe tener un certificado SSL, su instalación se muestra mas abajo
+
+- Descargar e instalar SPDY
+
+- wget https://dl-ssl.google.com/dl/linux/direct/mod-spdy-beta_current_amd64.deb
+- sudo dpkg -i mod-spdy-*.deb
+- sudo apt-get -f install
+
+- cat /etc/apt/sources.list.d/mod-spdy.list
+- service apache2 restart
+
+- Añadir en httpd.conf
+
+- nano /etc/apache2/http.conf
+
+- añadir
+
+SpdyEnabled on
+
+AddHandler mod_python .py
+PythonHandler mod_python.publisher
+PythonDebug On
+
+AddHandler application/x-httpd-php .php5 .php4 .php .php3 .phtml
+AddType application/x-httpd-php .php5 .php4 .php .php3 .phtml
+
+- Guardar
+
+Reiniciamos apache
+
+- service apache2 restart
+
+Instalamos phpmyadmin
+
+- apt-get install phpmyadmin
+
+- Enlace simbolico al phpmyadmin
+
+- ln -s /usr/share/phpmyadmin /var/www
+
+-Creación Usuario MySQL
+
+mysql -uroot -pxxx
+
+- Donde xxx es la clave que ingreso al instalar MySQL
+
+si desea cambiar la clave root solo ejecute esto en la misma consola
+
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('yyy');
+
+cambie yyy por la clave nueva
+
+----- Datos de ViSeR Provisionales ----
+login: web
+password: j9Lsa5anCpFSGpR6
+Privilegios TODOS
+---------------------------------------
+
+Para crear los permisos etc en la misma consola ejecutar estas Consultas SQL:
+
+CREATE USER 'web'@'%' IDENTIFIED BY '***';
+GRANT ALL PRIVILEGES ON * . * TO 'web'@'%' IDENTIFIED BY '***' WITH GRANT OPTION MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;
+
+CREATE USER 'web'@'localhost' IDENTIFIED BY '***';
+
+GRANT ALL PRIVILEGES ON * . * TO 'web'@'localhost' IDENTIFIED BY '***' WITH GRANT OPTION MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;
+
+Editar:
+
+- nano /etc/mysql/my.cnf
+
+y cambiar la línea:
+
+bind-address = localhost
+
+o si usted posee una ip interna por ejemplo 192.168.1.20
+
+bind-address = 192.168.1.20
+
+- Guardar
+
+Reiniciamos el servicio
+
+- service mysql restart
+
+- Creación de Certificado
+
+- apt-get install openssl mod_ssl
+- openssl genrsa -des3 -out server.key 512
+- cp server.key server.key.passphrase
+- openssl rsa -in server.key.passphrase -out server.key
+- openssl req -new -x509 -nodes -sha1 -days 365 /-key server.key -out server.crt
+- openssl req -new -key server.key -out server.csr
+- a2ensite default-ssl
+- a2enmod ssl
+
+----- Datos de ViSeR Certificado provisional ----
+Phrase: ubuntuserverwebVISER
+Password: viser6900321
+Entidad: ViSeRProject
+---------------------------------------------------
+
+- Incluir estas directivas dentro del código del servidor virtual de Apache que se encargue de HTTPS:
+
+SSLEngine on
+SSLCertificateFile /etc/apache2/ssl.crt/server.crt
+SSLCertificateKeyFile /etc/apache2/ssl.crt/server.key
+
+Cambie el.ejemplo.org por el dato correcto a usar
+
+Ejemplo:
+
+Listen aqui-ip-publica:80
+Listen aqui-ip-publica:443
+
+NameVirtualHost aqui-ip-publica:443
+
+<VirtualHost IP-DE-LA-MAQUINA:443>
+
+ServerAdmin info@viserproject.com
+DocumentRoot /var/www/virtuals/https.el.ejemplo.org
+ServerName https.ejemplo.org
+
+<Directory /var/www/virtuals/https.el-ejemplo.org>
+
+Options FollowSymLinks
+AllowOverride All
+Order allow,deny
+Allow from All
+
+</Directory>
+
+SSLEngine on
+SSLCertificateFile cert/server.crt
+SSLCertificateKeyFile cert/server.key
+ErrorLog logs/https.ejemplo.org_ssl-error_log
+CustomLog logs/https.ejemplo.org_ssl-access_log common
+
+</VirtualHost>
+
+- Guardar
+
+Reiniciamos apache
+
+- service apache2 restart
+
+- Trabajar con sitios web
+
+mkdir /var/www/sitios
+cd /etc/apache2/sites-available/
+cp default sitios
+
+Modificar de ser necesario:
+
+- nano sitios
+
+Continuamos:
+
+- a2ensite sitios
+
+- Editar
+- sudo nano /etc/apache2/ports.conf
+
+# Añadimos los servidores virtuales:
+
+Listen 80
+Listen 443
+
+NameVirtualHost *:80
+NameVirtualHost *:443
+
+- Guardar
+
+- service apache restart
+
+Ahora, modificaremos algunos parametros necesarios en PHP
+
+- Deshabilitar 'allow_url_fopen' y 'allow_url_include' (PHP5) in php.ini.
+
+- nano /etc/php5/apache2/php.ini
+
+Buscar y sustituir;
+
+allow_url_fopen = Off
+allow_url_include = Off
+
+- Guardamos
+
+Modifiquemos algunos parámetros en Apache
+
+- Editar y añadir en
+
+- nano /etc/apache2/sites-available/default
+
+Al principio dentro de <Directory /> colocar:
+
+Options +FollowSymlinks
+ServerSignature Off
+SetEnv TZ America/Caracas
+RewriteEngine On
+
+RewriteCond %{QUERY_STRING} mosConfig_[a-zA-Z_]{1,21}(=|\%3D) [OR]
+RewriteCond %{QUERY_STRING} base64_encode.*\(.*\) [OR]
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+RewriteCond %{HTTP_USER_AGENT} libwww [NC,OR]
+RewriteCond %{QUERY_STRING} ^(.*)=http [NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+php_flag zlib.output_compression On
+php_value zlib.output_compression_level 2
+SetOutputFilter DEFLATE
+Header unset ETag
+Header append Vary User-Agent
+FileETag None
+SetEnv SERVER_ADMIN webmaster@vaslibre.org.ve
+
+<Files .htaccess>
+
+order allow,deny
+deny from all
+
+</Files>
+
+<Files php.ini>
+
+order allow,deny
+deny from all
+
+</Files>
+
+- Guardar
+
+- service apache restart
+
+El acceso por FTP será por medio de SFTP
+
+- apt-get install openssh-server
+
+Ahora instalaremos un panel de control en este caso usamos panel
+
+- Instalación de panel de control
+
+Sitio web del panel: http://sourceforge.net/projects/zpanelcp/
+
+instrucciones:
+
+- apt-get -y install tofrodos
+
+Descargar o crear ZPX_ubuntu_11-10_auto_installer.sh
+
+fromdos ZPX_ubuntu_11-10_auto_installer.sh
+chmod +x ZPX_ubuntu_11-10_auto_installer.sh
+/ZPX_ubuntu_11-10_auto_installer.sh
+shutdown -r now
+
+después que AppArmor sea removido
+
+./ZPX_ubuntu_11-10_auto_installer.sh
+
+Reboor despues de la instalación
+
+El login y password por defecto es:
+
+Name: zadmin Password: password
+
+Puede ser cambiado despues del primer login
+
+Optimizaciones adicionales
+
+Editamos y añadimos:
+
+- nano /etc/loader.conf
+
+accf_http_load="YES"
+accf_data_load="YES"
+kern.ipc.somaxconn=1024
+
+- Guardar
+
+Las primeras 2 lineas cargan los módulos accf_http y accf_data en el kernel, al iniciar el sistema.
+
+Reducir la latencia y uso de CPU a través de la reducción del número de cambios de contexto.
+
+- nano /etc/sysctl.conf
+
+net.isr.direct=1
+kernel.sched_autogroup_enabled = 1
+kernel.sched_rt_runtime_us = 950000
+kernel.threads-max = 98006
+
+Editar y añadir en httpd.conf
+
+- nano /etc/apache2/httpd.conf
+
+EnableMMAP on
+EnableSendfile off
+KeepAlive Off
+
+Timeout 45
+
+MaxKeepAliveRequests 200
+KeepAliveTimeout 5
+MinSpareServers 45
+MaxSpareServers 60
+StartServers 45
+MaxClients 500
+MaxRequestsPerChild 5
+
+- Guardar
+
+Aumentamos el rendimiento de Apache (Opcional)
+
+Instalamos mod-pagespeed
+
+- wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-beta_current_amd64.deb
+- dpkg -i mod-pagespeed*.deb
+- rm mod-pagespeed*.deb
+
+Editamos:
+
+- nano /etc/apache2/mods-available/pagespeed.conf
+
+Según lo amerite cambiar estos valores:
+
+ModPagespeed on: Puede habilitar o deshabilitar pagespeed con esta línea.
+ModPagespeedDisallow: Para excluir un directorio o archivo de las optimizaciones de pagespeed. Esto puede ser necesario en algunos archivos javascript. Ejemplos de uso:
+ModPagespeedDisallow */archivo1.js - este directivo deshabilita pagespeed para el archivo1.js en cualquier directorio.
+
+ModPagespeedDisallow */directorio1/* - también puede excluir un directorio completo y sus archivos.
+
+ModPagespeedDisallow * - puede utilizar este directivo para excluir todos los directorios y archivos y habilitar directorios específicos.
+
+ModPagespeedAllow: Igual a ModPagespeedDisallow, pero con efecto opuesto. Se utiliza para habilitar pagespeed para directorios o archivos específicos. No es necesario usar ModPagespeedAllow al menos que se ha utilizado ModPagespeedDisallow
+
+AddOutputFilterByType MOD_PAGESPEED_OUTPUT_FILTER: El archivo puede contener 2 líneas con este directivo, uno para habilitar el procesamiento de HTML y otro para XHTML y XML.
+
+ModPagespeedFileCachePath y ModPagespeedGeneratedFilePrefix: Por defecto estos señalan a /var/mod_pagespeed/cache/ y /var/mod_pagespeed/files/ respectivamente. Son utilizado por pagespeed para guardar archivos optimizados. Puede cambiar los directorios, pero deben ser directorios existentes y pueden ser escritos por Apache ya que el módulo pagespeed no crea los directorios.
+
+ModPagespeedRewriteLevel: Determina los filtros utilizados por pagespeed. Por defecto no hace falta configurar este directivo si desea utilizar los filtros principales. La opción por defecto es CoreFilters, pero también puede utilizar TestingCoreFilters para habilitar los filtros inestables o beta. Si desea escoger los filtros uno por uno, puede introducir ModPagespeedRewriteLevel PassThrough para habilitar sólo los filtros que prefiere.
+
+ModPagespeedDisableFilters: Permite excluir filtros específicos, por ejemplo si ocurren errores debido a un filtro en particular.
+
+ModPagespeedEnableFilters: Permite habilitar filtros no incluidos en Core. También se utiliza si decide usar la opción PassThrough para controlar lo filtros utilizados por el módulo pagespeed.
+
+ModPagespeedShardDomain: Permite distribuir los archivos optimizados por pagespeed entre varios sub-dominios del dominio principal. Por ejemplo, con un dominio principal de ejemplo.com, si se configuran sub-dominios como sub1.ejemplo.com, sub2.ejemplo.com, etc., entonces pagespeed los puede utilizar para distribuir los archivos optimizados. Esto es particularmente efectivo si tiene más de 30 recursos por página. No debe utilizar más de 4 sub-dominios ya que puede ralentizar la página en vez de acelerarla. El sintaxis es ModPagespeedShardDomain dominio_principal subdominio1,subdominio2, subdominio3. Utilizando ejemplo.com, la línea para utilizar los dos sub-dominios sería ModPagespeedShardDomain ejemplo.com sub1.ejemplo.com,sub2.ejemplo.com. Los dominios utilizados ya deben estar configurados en su servidor DNS. Debe tener cuidado con esta opción ya que los resultados pueden variar y no todos los javascripts funcionan con esta opción habilitada.
+
+ModPagespeedJpegRecompressionQuality: Permite configurar la calidad de la imagen JPG creada por pagespeed con la opción rewrite_images. Por defecto, esta opción sólo remueve la información de la imagen. Pero se puede configurar para recomprimir sus imágenes JPG con una calidad más pequeña. Por ejemplo, si tiene muchas imágenes sin optimizar, puede usar ModPagespeedJpegRecompressionQuality 70 para reducir el tamaño del archivo de cada uno y acelerar más su página web.
+
+Para conocer más ir: https://developers.google.com/speed/docs/mod_pagespeed/config_filters
+
+- Configuración de Servidor Web Finalizada.
+Adicionalmente se puede instalar PostgreSQL de ser necesario:
+
+PostgreSQL es un potente y robusto motor de bases de datos, que tiene prestaciones y funcionalidades equivalentes a muchos gestores de bases de datos comerciales. Es más completo que MySQL ya que permite métodos almacenados, restricciones de integridad, vistas, etc. Esta publicado bajo la licencia BSD.
+
+Entre sus características:
+Números de precisión arbitraria.
+Texto de largo ilimitado.
+Figuras geométricas (con una variedad de funciones asociadas).
+Direcciones IP (IPv4 e IPv6).
+Bloques de direcciones estilo CIDR.
+Direcciones MAC.
+Arrays.
+Claves ajenas también denominadas Llaves ajenas o Claves Foráneas (foreign keys).
+Integridad transaccional.
+Herencia de tablas.
+Tipos de datos y operaciones geométricas.
+Soporte para transacciones distribuidas.
+
+Para su instalación:
+
+- apt-get install postgresql-9.1 postgresql-client-9.1 phppgadmin
+
+Colocar contraseña:
+
+- passwd postgres
+
+Cambiar privilegios de acceso al shell del usuario postgres con el siguiente comando:
+
+- vipw
+
+Cambiamos el shell del usuario postgresSQL de "/bin/false" a "/bin/bash".
+
+Salimos grabando con escape ":wq". Para verificar si la instalación fue satisfactoria accedemos a la shell del servidor de bases de datos:
+
+postgres -c "psql template1"
+
+Si el acceso ha sido satisfactorio cambiamos la contraseña al usuario predeterminado del servidor de bases de datos:
+
+template1=# ALTER USER postgres WITH PASSWORD 'nueva_contraseña';
+
+Salir
+
+template1=# \q
+
+Permitiremos conexiones remotas editando:
+
+- nano /etc/postgresql/9.1/main/postgresql.conf
+
+buscamos las siguientes líneas:
+
+#listen_addresses = 'localhost'
+
+Substituimos por:
+
+listen_addresses = '*'
+
+Buscamos ahora:
+
+#password_encryption = on
+
+Y sustituimos por:
+
+password_encryption = on
+
+- Guardar
+
+Reiniciamos el servicio
+
+- service postgresql-9.1 restart
+
+El servido web cuenta con las herramientas necesarias para trabajar correctamente.
+Consideraciones especiales:
+- Evaluar en MySQL las directrices max_connections y max_user_connections para un mejor performance.
+- Hacer buen uso de la cache. En Apache si dispones de mucha RAM mod_mem_cache es la mejor opción.
+- Realiza copias de seguridad de la configuración actual antes de realizar cualquier cambio, ya que por muy pequeño que sea el cambio puede afectar el rendimiento y funciones del servidor.
+- El prefork MPM divide varios procesos idénticos de Apache y está; más orientado a máquinas de dos CPUs. Cuantas más CPUs tenga nuestro servidor Web, tanto más probable será que MPM, que usa varios hilos por proceso, sea la mejor elección.
+- Cuando PHP es usado como un módulo de Apache, hereda los permisos del usuario de Apache (generalmente los del usuario "nobody"). Este hecho representa varios impactos sobre la seguridad y las autorizaciones. Por ejemplo, si se está usando PHP para acceder a una base de datos, a menos que tal base de datos disponga de un control de acceso propio, se tendrá que hacer que la base de datos sea accesible por el usuario "nobody".
+- Un error de seguridad cometido con frecuencia en este punto es darle permisos de administrador (root) a apache, o incrementar las habilidades del usuario de apache de alguna otra forma. Incrementar los permisos del usuario de Apache hasta el nivel de administrador es extremadamente peligroso y puede comprometer al sistema entero, así que el uso de entornos sudo, chroot, o cualquier otro mecanismo que sea ejecutado como root no deberá ser considerado como una opción por aquellos que no son profesionales en seguridad.
+- Instalar a Apache el módulo "mod_pagespeed" este incrementará la velocidad de respuesta de las peticiones, reduciendo los tiempos de carga casi un 50%.
+
+Esta configuración del archivo my.conf optimizará el rendimiento de MySQL (opcional) puedes crear una nueva configuración óptima desde http://tools.percona.com/ (solo debes estar registrado - gratis)
+
+- Editar el archivo my.cnf
+
+nano /etc/mysql/my.cnf
+
+
+Cambiar y/o agregar
+
+
+
+
+# Configuration name Viser generated for xombra
+
+[mysql]
+
+# CLIENT #
+port = 3306
+socket = /var/lib/mysql/data/mysql.sock
+
+[mysqld]
+
+# GENERAL #
+
+user = mysql
+default_storage_engine = InnoDB
+
+# modificar conforme a su instalacion #
+
+socket = /var/lib/mysql/data/mysql.sock
+pid_file = /var/lib/mysql/data/mysql.pid
+
+# MyISAM #
+
+key_buffer_size = 32M
+
+# SAFETY #
+
+max_allowed_packet = 16M
+max_connect_errors = 1000000
+
+# DATA STORAGE #
+# modificar conforme a su instalacion #
+
+datadir = /var/lib/mysql/data/
+
+# BINARY LOGGING #
+# modificar conforme a su instalacion #
+
+log_bin = /var/lib/mysql/data/mysql-bin
+
+expire_logs_days = 14
+sync_binlog = 1
+
+# CACHES AND LIMITS #
+tmp_table_size = 32M
+max_heap_table_size = 32M
+query_cache_type = 0
+query_cache_size = 0
+max_connections = 500
+thread_cache_size = 50
+open_files_limit = 65535
+table_definition_cache = 1024
+table_open_cache = 2048
+
+# INNODB #
+innodb_flush_method = O_DIRECT
+innodb_log_files_in_group = 2
+innodb_log_file_size = 64M
+innodb_flush_log_at_trx_commit = 1
+innodb_file_per_table = 1
+innodb_buffer_pool_size = 592M
+
+# LOGGING #
+# modificar conforme a su instalacion #
+
+log_error = /var/lib/mysql/data/mysql-error.log
+log_queries_not_using_indexes = 1
+slow_query_log = 1
+slow_query_log_file = /var/lib/mysql/data/mysql-slow.log
+
+- Guardar
+
+- service mysql restart
+
+
+
+Máquina WEB ViSeR completada
+
+Documentación de fecha: 15 May 2013 - 10:40 am

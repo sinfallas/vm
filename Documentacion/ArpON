@@ -1,0 +1,55 @@
+Evitar ARP Spoofing con ArpON
+
+Arpón (es un controlador ARP) es un demonio que hace del protocolo ARP seguro, para evitar el Hombre en el ataque medio (Man In The Middle - MITM) a través de ARP Spoofing (técnica usada para infiltrarse en una red ethernet conmutada (basada en switches y no en hubs), que puede permitir al atacante leer paquetes de datos en la LAN (red de área local), modificar el tráfico, o incluso detenerlo.).  Bloquea también ataques derivados de ello, como: Sniffing, Hijacking, Injection, tambien:  DNS Spoofing, WEB Spoofing, Session Hijacking y SSL/TLS Hijacking.
+
+Instalación y Configuración
+
+sudo su
+
+apt-get install arpon 
+
+Implementa los siguientes algoritmos:
+
+- SARPI – Static ARP inspection: Redes sin DHCP. Utiliza una lista estática de entradas y no permite modificaciones.
+
+- DARPI – Dynamic ARP inspection: Redes con DHCP. Controla peticiones ARP entrantes y salientes, cachea las salientes y fija un timeout para la respuesta entrante.
+
+- HARPI – Hybrid ARP inspection: Redes con o sin DHCP. Utiliza dos listas simultáneamente.
+
+Luego de instalarlo la configuración es realmente muy simple.
+
+Editamos el archivo ( /etc/default/arpon )
+
+ nano /etc/default/arpon 
+
+Allí editamos lo siguiente:
+
+La opción que pone ( RUN=”no” ) Le ponemos ( RUN=”yes” )
+
+Luego descomentas la linea que pone ( DAEMON_OPTS=”-q -f /var/log/arpon/arpon.log -g -s” )
+
+Quedando algo como:
+
+ # Defaults for arpon initscript
+ # sourced by /etc/init.d/arpon
+ # installed at /etc/default/arpon by the maintainer scripts
+ # You must choose between static ARP inspection (SARPI) and
+ # dynamic ARP inspection (DARPI)
+ #
+ # For SARPI uncomment the following line (please edit also /etc/arpon.sarpi)
+
+ DAEMON_OPTS="-q -f /var/log/arpon/arpon.log -g -s"
+
+ # For DARPI uncomment the following line
+ # DAEMON_OPTS="-q -f /var/log/arpon/arpon.log -g -d"
+ # Modify to RUN="yes" when you are ready
+
+ RUN="yes"
+
+Y reinicias el servicio:
+
+ sudo /etc/init.d/arpon restart
+
+
+Sitio Oficial:
+http://arpon.sourceforge.net/index.html

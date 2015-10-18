@@ -1,0 +1,60 @@
+X Window System
+
+LightDM es un gestor de sesiones para X Window System, creado con el objetivo de ser ligero, rápido, extensible a las necesidades del usuario y que funcione con diversos entornos de escritorio. Pueden desarrollarse interfaces para inicio de sesión basadas en HTML, debido a que utiliza WebKit. Disponible bajo licencia GPL
+
+Información adiconal: http://freedesktop.org/wiki/Software/LightDM
+
+OpenBox el escritorio full Ligero
+
+Sitio oficial: http://www.openbox.org/
+
+Es un gestor de ventanas libre para el Sistema X Window, disponible bajo licencia GPL. Está diseñado para ser rápido y consumir una mínima cantidad de recursos.
+
+idesk Muestra los iconos en el escritorio
+conky: monitor de sistema
+Openbox: WindowsManager a instalar.
+Obconf: Asistente de configuración de OpenBox.
+Obmenu: gui para configurar Menu de Openbox.
+Nitrogen: Se encarga principalmente de la gestión de nuestros wallpapers
+Thunar: Gestor de archivos
+Tint2: Panel donde se veran las ventanas abiertas, y las aplicaciones del tray..
+Xcompmgr: es un gestor de composición ligero capaz de renderizar sombras, degradados y sencillas transparencias de las ventanas.
+xscreensaver: Salva pantalla
+	
+Thunar y Nitrogen se complementan
+
+Instalar OpenBox
+
+apt-get install openbox openbox-xdgmenu nitrogen tint2 obconf obmenu xcompmgr thunar openbox-themes menu  
+apt-get install idesk xscreensaver xscreensaver-gl-extra xscreensaver-data-extra conky-all
+
+De ser necesario realizar los siguientes pasos:
+
+mkdir .config/openbox/
+
+cp /etc/xdg/openbox/{menu.xml,autostart,rc.xml} /tuperfil/.config/openbox/{menu.xml,autostart,rc.xml}
+
+
+La función de los archivos copiados:.
+
+menu.xml : Archivo que configura el Menu de OpenBox (clik derecho sobre desktop). Desde allí se pueden lanzar aplicaciones o scripts, por ejemplo.
+
+rc.xml : Archivo de configuración principal de OpenBox, desde él se configuran las acciones de las teclas, el aspecto visual del mismo, entre otras cosas.
+
+autostart: Lanzaran aplicaciones que nosotros definamos al inicio de la sesión. Como por ejemplo conky o tint2.
+
+Para lanzarlo tenemos dos opciones. Sumarlo al ~/.xinitrc 
+
+Modificar /etc/xdg/openbox/autostart.sh y tuperfil/.config/openbox/autostart.sh
+
+y colocar:
+
+thunar --daemon &
+nitrogen --restore &
+tint2 &
+xscreensaver -no-splash &
+xcompmgr -cf &
+
+Guardar
+
+Reinicia y elije el escritorio LXDE

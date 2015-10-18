@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es-es" lang="es-es" dir="ltr">
+
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>	
+	  
+  
+  <meta name="keywords" content="blog, blog seguridad informatica, formacion seguridad informatica, seguridad informatica, honeypot, atacar equipo">
+  <meta name="author" content="Administrator">
+  <meta name="description" content="Montando un honeypot">
+  <meta name="generator" content="Joomla! - Open Source Content Management">
+  <title>Montando un honeypot (I de II)</title>
+  <link href="Montando%20un%20honeypot%20%28I%20de%20II%29_files/favicon0.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
+  <link rel="stylesheet" href="Montando%20un%20honeypot%20%28I%20de%20II%29_files/style000.css" type="text/css">
+  <link rel="stylesheet" href="Montando%20un%20honeypot%20%28I%20de%20II%29_files/style001.css" type="text/css">
+  <style type="text/css">
+.mod_fuofb {text-align: center;}
+  </style>
+  <script src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/mootools.js" type="text/javascript"></script>
+  <script src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/core0000.js" type="text/javascript"></script>
+  <script src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/caption0.js" type="text/javascript"></script>
+  <script src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/mootoolt.js" type="text/javascript"></script>
+  <script src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/slicomme.js" type="text/javascript"></script>
+  <script type="text/javascript">
+window.addEvent('load', function() {
+				new JCaption('img.caption');
+			});
+function keepAlive() {	var myAjax = new Request({method: "get", url: "index.php"}).send();} window.addEvent("domready", function(){ keepAlive.periodical(840000); });
+  </script>
+
+	<link rel="stylesheet" href="Montando%20un%20honeypot%20%28I%20de%20II%29_files/styles00.css" type="text/css">
+	<link rel="stylesheet" href="Montando%20un%20honeypot%20%28I%20de%20II%29_files/NivooSli.css" type="text/css">
+	<link rel="stylesheet" href="Montando%20un%20honeypot%20%28I%20de%20II%29_files/cookiecu.css" type="text/css" media="all">	
+	
+	<script src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/jquery00.js" type="text/javascript"></script>
+	<script type="text/javascript" src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/jquery01.js"></script>
+	<script type="text/javascript" src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/jquery02.js"></script>	
+	
+<script type="text/javascript">
+	jQuery.noConflict();
+	var $j = jQuery;
+</script>
+
+<script type="text/javascript" src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/NivooSli.js"></script>
+	
+<script type="text/javascript">	
+	if ($j.cookie('cc_cookie_decline') == "cc_cookie_decline") {					
+		} else if ($j.cookie('cc_cookie_accept') == "cc_cookie_accept") {
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-5547012-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+			  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			})();			
+		} else {
+			$j(document).ready(function () {
+				$j.cookieCuttr({
+					cookieDeclineButton: true,
+					cookieAnalytics: false,
+					cookiePolicyLink: './index.php/privacidad',
+					cookieMessage: 'Nuestra web usa cookies para mejorar su experiencia; puede <a href="/{{cookiePolicyLink}}" title="lea acerca de nuestras cookies">saber cuáles aquí</a>'
+				});						
+			});					
+		}			
+</script>
+
+<script type="text/javascript">
+	window.addEvent('domready', function () {
+		new NivooSlider(('Slider'), {
+			effect: 'random',
+			interval: 5000,
+			orientation: 'random'
+		});
+	});		
+</script>
+
+<link href="Montando%20un%20honeypot%20%28I%20de%20II%29_files/css00000.css" rel="stylesheet" type="text/css">
+
+<!--- This file contains the functions of the template. DO NOT MODIFY IT, otherwise the template will break !---> 
+</head>
+
+<body class="background">
+<div id="main">
+<div id="header-w">
+    	<div id="header">
+		<div class="topmenu">
+			
+		</div>
+        	        
+            	<a href="http://protegetuordenador.com/">
+			<img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/logo0000.png" border="0" class="logo">
+			</a>
+            		<div class="slogan"></div>
+                                     
+	</div>        
+</div>
+<div id="wrapper">
+        	<div id="navr">
+			<div class="tguser"></div>
+		<div id="navl">
+		<div id="nav">
+				<div id="nav-left">
+
+<ul class="menu">
+<li class="item-154"><a href="http://protegetuordenador.com/index.php/privacidad">Privacidad</a></li><li class="item-30"><a href="http://protegetuordenador.com/index.php/contenido-archivado">Artículos archivados</a></li><li class="item-9"><a href="http://protegetuordenador.com/index.php/informacionlegal">Información legal</a></li><li class="item-10"><a href="http://protegetuordenador.com/index.php/contacto">Contacto</a></li><li class="item-8"><a href="http://protegetuordenador.com/index.php/mapasitio">Mapa del sitio</a></li></ul>
+</div>
+	<div id="nav-right">
+	</div></div></div></div><div id="main-content"><!--[if IE 6]><link rel="stylesheet" href="/ DOCTYPE html type="text/css" media="screen" PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN < ?php echo $templateUrl; ?>/css/template.ie6.css" DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN type="text/css" media="screen" /><![endif]-->	        	
+<div class="breadcrumbs">
+<span class="showHere">Usted está aquí: </span><a href="http://protegetuordenador.com/" class="pathway">Inicio</a> <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/arrow000.png" alt=""> <a href="http://protegetuordenador.com/index.php/blog" class="pathway">Blog</a> <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/arrow000.png" alt=""> <span>Montando un honeypot (I de II)</span></div>
+
+        	<div class="clearpad"></div>
+	<div id="message">
+	    
+<div id="system-message-container">
+</div>
+	</div>    
+            <div id="leftbar-w">
+    <div id="sidebar">
+        	<div class="module">
+        <div class="inner">
+				<div class="h3c"><div class="h3r"><div class="h3l"><h3 class="module-title">Menú principal</h3></div></div></div>
+			    <div class="module-body">
+	        
+<ul class="menu">
+<li class="item-37"><a href="http://protegetuordenador.com/">Noticias</a></li><li class="item-140 current active"><a href="http://protegetuordenador.com/index.php/blog">Blog</a></li><li class="item-3"><a href="http://protegetuordenador.com/index.php/menuzonapadres">Zona Padres</a></li><li class="item-6"><a href="http://protegetuordenador.com/index.php/manuales">Manuales</a></li><li class="item-31"><a href="http://protegetuordenador.com/index.php/antivirus-online">Antivirus online</a></li><li class="item-35"><a href="http://protegetuordenador.com/index.php/programas-utiles">Programas útiles</a></li></ul>
+        </div>
+        </div>
+	</div>
+		<div class="module">
+        <div class="inner">
+				<div class="h3c"><div class="h3r"><div class="h3l"><h3 class="module-title">Login</h3></div></div></div>
+			    <div class="module-body">
+	        <form action="http://protegetuordenador.com/index.php/blog" method="post" id="login-form">
+		<fieldset class="userdata">
+	<p id="form-login-username">
+		<label for="modlgn-username">Usuario</label>
+		<input id="modlgn-username" type="text" name="username" class="inputbox" size="18">
+	</p>
+	<p id="form-login-password">
+		<label for="modlgn-passwd">Contraseña</label>
+		<input id="modlgn-passwd" type="password" name="password" class="inputbox" size="18">
+	</p>
+		<p id="form-login-remember">
+		<label for="modlgn-remember">Recordarme</label>
+		<input id="modlgn-remember" type="checkbox" name="remember" class="inputbox" value="yes">
+	</p>
+		<input type="submit" name="Submit" class="button" value="Iniciar sesión">
+	<input type="hidden" name="option" value="com_users">
+	<input type="hidden" name="task" value="user.login">
+	<input type="hidden" name="return" value="aW5kZXgucGhwP29wdGlvbj1jb21fY29udGVudCZ2aWV3PWFydGljbGUmY2F0aWQ9MjQmaWQ9NjI3Jkl0ZW1pZD0xNDA=">
+	<input type="hidden" name="cbfa17b12cc1cda01878e0df4df95e0e" value="1">	</fieldset>
+	<ul>
+		<li>
+			<a href="http://protegetuordenador.com/index.php/component/users/?view=reset">
+			¿Olvido su contraseña?</a>
+		</li>
+		<li>
+			<a href="http://protegetuordenador.com/index.php/component/users/?view=remind">
+			¿Olvido su usuario?</a>
+		</li>
+				<li>
+			<a href="http://protegetuordenador.com/index.php/component/users/?view=registration">
+				Crear una cuenta</a>
+		</li>
+			</ul>
+	</form>
+        </div>
+        </div>
+	</div>
+	</div>
+<!-- MODIFY social buttons here (add yours from addthis.com) -->
+<!-- END of social script -->
+</div>
+        	
+<div id="centercontent">
+<!-- Slideshow -->
+		
+<!-- END Slideshow -->
+<div class="clearpad">
+<div class="item-page">
+
+
+
+		<h2 class="item-page-title">
+
+				
+				<a href="http://protegetuordenador.com/index.php/blog/627-montando-un-honeypot-i-de-ii">
+
+						Montando un honeypot (I de II)</a>
+
+				
+		</h2>
+
+
+
+
+
+
+
+	
+
+
+	
+
+
+
+
+
+
+ <div class="iteminfo">
+
+
+
+
+
+
+
+<div class="clr"></div>
+
+
+
+
+
+		<span class="published">
+
+		Fecha de Publicación
+		</span>
+
+
+
+	<span class="createdby"> 
+
+		
+		
+
+
+			
+				Escrito por Texpaok
+			
+	</span>
+
+	
+
+
+ </div>
+
+
+
+
+	
+    
+
+	<p style="margin-bottom: 0cm;">En los últimos meses he dejado un poco desatendido el blog ya que he estado cursando unas asignaturas de un Máster de una conocida Universidad española. Una de estas asignaturas trata aspectos relacionados con la seguridad informática, y una de sus prácticas consistía en la <strong>creación de un honeypot</strong>. Como el tema me ha parecido interesante, os voy a contar cómo podéis <strong>montar vuestro propio honeypot accesible desde Internet</strong>.</p>
+<ul>
+<li>
+<p style="margin-bottom: 0cm;"><em>¿Qué es un honeypot?</em></p>
+</li>
+</ul>
+<p style="margin-bottom: 0cm;">Lo primero que hemos de hacer es definir qué es un honeypot. Podríamos definir un honeypot como un <strong>recurso de red destinado a ser atacado y comprometido</strong>, que nos proporciona información sobre el atacante y los métodos que emplea. Gracias a los honeypots, se puede estudiar el comportamiento de los atacantes, deducir las prácticas más habituales, descubrir nuevos exploits, rastrear sus movimientos, etc.</p>
+<ul>
+<li>
+<p style="margin-bottom: 0cm;"><span style="color: #000000;"><span style="font-family: Verdana,sans-serif;"><span style="font-size: x-small;"><strong>Qué no hace un honeypot</strong></span></span></span></p>
+</li>
+</ul>
+<p style="margin-bottom: 0cm;"><span style="color: #000000;"><span style="font-family: Verdana,sans-serif;"><span style="font-size: x-small;"> No corrige las vulnerabilidades existentes en los sistemas.</span></span></span></p>
+<p style="margin-bottom: 0cm;"><span style="color: #000000;"><span style="font-family: Verdana,sans-serif;"><span style="font-size: x-small;"> No soluciona los problemas de seguridad de nuestra red.</span></span></span></p>
+<p style="margin-bottom: 0cm;"><span style="color: #000000;"><span style="font-family: Verdana,sans-serif;"><span style="font-size: x-small;"> No evita que nuestros sistemas sean atacados.</span></span></span></p>
+<ul>
+<li>
+<p style="margin-bottom: 0cm;"><span style="color: #000000;"><span style="font-family: Verdana,sans-serif;"><span style="font-size: x-small;"><strong>Características</strong></span></span></span></p>
+</li>
+</ul>
+<p style="margin-bottom: 0cm;">Genera un volumen pequeño de datos.</p>
+<p style="margin-bottom: 0cm;">No existen los falsos positivos.</p>
+<p style="margin-bottom: 0cm;">Necesitan recursos informáticos mínimos.</p>
+<p style="margin-bottom: 0cm;">Son elementos pasivos.</p>
+<p style="margin-bottom: 0cm;">Son fuentes potenciales de riesgo para la red.</p>
+<p style="margin-bottom: 0cm;">Tienen un limitado carácter preventivo.</p>
+<p style="margin-bottom: 0cm;">Son programables en cuanto a la reacción contra el atacante.</p>
+<ul>
+<li>
+<p style="margin-bottom: 0cm;"><strong>Posibles utilidades</strong></p>
+</li>
+</ul>
+<p style="margin-bottom: 0cm;">Son muy útiles para realizar investigaciones forenses porque permiten analizar la actividad del atacante.</p>
+<p style="margin-bottom: 0cm;">En sistemas en producción brindan (algo de) protección, prevención y respuesta a cierto tipo de ataques.</p>
+<p style="margin-bottom: 0cm;">Permiten recoger numerosa y valiosa información sobre las actividades y tendencias del atacante.</p>
+<ul>
+<li>
+<p style="margin-bottom: 0cm;"><em>Honeynets</em></p>
+</li>
+</ul>
+<p style="margin-bottom: 0cm;">Se define una Honeynet como un conjunto de Honeypots altamente interactivos diseñados para la investigación y la obtención de información sobre atacantes. Una Honeynet <strong>es una arquitectura</strong>, no un producto o un software determinado.</p>
+<p style="margin-bottom: 0cm;"><strong>El objetivo es el de hacer creer al atacante que está ante una red “real”</strong>, por lo que se deben añadir los distintos elementos que conforman una arquitectura de red.</p>
+<ul>
+<li>
+<p style="margin-bottom: 0cm;"><em>Diagrama de red</em></p>
+</li>
+</ul>
+<p style="margin-bottom: 0cm;">Aunque vamos a montar el entorno en nuestro ordenador, podemos extrapolar la arquitectura a cualquier sistema en producción, colocándolo en distintas ubicaciones según nuestras necesidades:</p>
+<p style="margin-bottom: 0cm;"><img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/honeypot.jpg" border="0" alt="Honeypot antes del firewall" width="447" height="315" style="border: 0;"> <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/honeypou.jpg" border="0" alt="Honeypot situado en la DMZ" width="447" height="315"></p>
+<p>En nuestro caso, nuestra arquitectura sería la siguiente:</p>
+<p style="margin-bottom: 0cm;">&nbsp;</p>
+<p style="text-align: center;"><img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/esquema_.jpg" border="0" alt="Esquema de nuestro honeypot" width="447" height="355"></p>
+<p style="margin-bottom: 0cm;"><span style="color: #ff0000;"><strong>Importante: El siguiente esquema de red representa un entorno real, utilizando como base nuestro equipo. Cualquier configuración errónea podría acarrear una brecha de seguridad. Si tenéis dudas, utilizad un entorno local como paso previo.</strong></span></p>
+<p style="margin-bottom: 0cm;">Además de montar el honeypot, vamos a incluir en la máquina un sistema de detección de intrusos basado en Snort (podéis encontrar cómo instalar/configurar Snort en el curso “Detección de intrusiones con Snort”). En nuestro router, abriremos los puertos hacia los servicios que ofrezca nuestro honeypot, redirigiendo las peticiones al honeypot.</p>
+<ul>
+<li>
+<p style="margin-bottom: 0cm;"><em>Entorno y productos necesarios</em></p>
+<p style="margin-bottom: 0cm;">Para crear nuestro entorno necesitamos una máquina Linux (he usado Ubuntu), los paquetes “honeyd” y “farpd” y la utilidad “Nmap”.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p style="margin-bottom: 0cm;" align="JUSTIFY"><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><span style="font-style: normal;"><strong>Honeyd</strong></span></span></span></span></strong><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><span style="font-style: normal;"><span style="font-weight: normal;">: Honeyd es un pequeño demonio que crea hosts virtuales en una red. Éstos pueden configurarse para correr servicios arbitrarios y adaptarse de forma que parezca que corren bajo ciertos sistemas operativos. Además, puede configurar una sola máquina para que simule múltiples direcciones de una LAN e incorpora seguridad añadiendo mecanismos para la detección de amenazas y su evaluación. También engaña a los usuarios escondiendo los sistemas reales en medio de los sistemas virtuales. Entre sus características, podemos destacar:</span></span></span></span></span></strong></p>
+<ul>
+<li>
+<ul>
+<li>
+<p style="margin-bottom: 0cm;" align="JUSTIFY"><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><em><span style="font-weight: normal;">Simulación de cientos de hosts virtuales al mismo tiempo</span></em></span></span></span></strong><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><span style="font-style: normal;"><span style="font-weight: normal;">.</span></span></span></span></span></strong></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;" align="JUSTIFY"><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><em><span style="font-weight: normal;">Configuración de servicios arbitrarios a través de ficheros de configuración</span></em></span></span></span></strong><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><span style="font-style: normal;"><span style="font-weight: normal;">, con conexiones proxy, identificación de sistemas remotos a través de “fingerprinting” y muestreos al azar para ampliar la carga.</span></span></span></span></span></strong></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm;" align="JUSTIFY"><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><em><span style="font-weight: normal;">Simulación de sistemas operativos a nivel de pila TCP/IP</span></em></span></span></span></strong><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><span style="font-style: normal;"><span style="font-weight: normal;">: Para ello utiliza nmap y xprobe y políticas ajustables de reemsamblado de fragmentos y de escaneos “FIN-scan”.</span></span></span></span></span></strong></p>
+</li>
+<li>
+<p style="margin-bottom: 0cm; font-style: normal;" align="JUSTIFY"><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><em><span style="font-weight: normal;">Virtualización de subsistemas</span></em></span></span></span></strong><strong><span style="color: #000000;"><span style="font-family: Times New Roman,serif;"><span style="font-size: small;"><span style="font-weight: normal;">: Esto permite correr aplicaciones UNIX bajo direcciones IP virtuales de Honeyd: servidores web, ftp, etc. Además, permite “port binding” dinámico en el espacio de direcciones virtuales e inicio en background de conexiones de red.</span></span></span></span></strong></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>&nbsp;</p> <div class="itp-social-buttons-box"><h4>Comparte este artículo</h4><div class="itp-sbb-bothl"><div class="itp-sb-center"><a href="http://del.icio.us/post?url=http%3A%2F%2Fprotegetuordenador.com%2Findex.php%2Fblog%2F627-montando-un-honeypot-i-de-ii&amp;title=Montando%20un%20honeypot%20%28I%20de%20II%29" title="Submit to Delicious" target="blank">
+		<img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/deliciou.png" alt="Submit to Delicious">
+		</a><a href="http://digg.com/submit?url=http%3A%2F%2Fprotegetuordenador.com%2Findex.php%2Fblog%2F627-montando-un-honeypot-i-de-ii&amp;title=Montando%20un%20honeypot%20%28I%20de%20II%29" title="Submit to Digg" target="blank">
+        <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/digg0000.png" alt="Submit to Digg">
+        </a><a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fprotegetuordenador.com%2Findex.php%2Fblog%2F627-montando-un-honeypot-i-de-ii&amp;t=Montando%20un%20honeypot%20%28I%20de%20II%29" title="Submit to Facebook" target="blank">
+        <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/facebook.png" alt="Submit to Facebook">
+        </a><a href="http://www.google.com/bookmarks/mark?op=edit&amp;bkmk=http%3A%2F%2Fprotegetuordenador.com%2Findex.php%2Fblog%2F627-montando-un-honeypot-i-de-ii" title="Submit to Google Bookmarks" target="blank">
+        <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/google00.png" alt="Submit to Google Bookmarks">
+        </a><a href="http://www.stumbleupon.com/submit?url=http%3A%2F%2Fprotegetuordenador.com%2Findex.php%2Fblog%2F627-montando-un-honeypot-i-de-ii&amp;title=Montando%20un%20honeypot%20%28I%20de%20II%29" title="Submit to Stumbleupon" target="blank">
+        <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/stumbleu.png" alt="Submit to Stumbleupon">
+        </a><a href="http://technorati.com/faves?add=http%3A%2F%2Fprotegetuordenador.com%2Findex.php%2Fblog%2F627-montando-un-honeypot-i-de-ii" title="Submit to Technorati" target="blank">
+        <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/technora.png" alt="Submit to Technorati">
+        </a><a href="http://twitter.com/share?text=Montando%20un%20honeypot%20%28I%20de%20II%29&amp;url=http%3A%2F%2Fprotegetuordenador.com%2Findex.php%2Fblog%2F627-montando-un-honeypot-i-de-ii" title="Submit to Twitter" target="blank">
+        <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/twitter0.png" alt="Submit to Twitter">
+        </a><a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fprotegetuordenador.com%2Findex.php%2Fblog%2F627-montando-un-honeypot-i-de-ii&amp;title=Montando%20un%20honeypot%20%28I%20de%20II%29" title="Submit to LinkedIn" target="blank">
+        <img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/linkedin.png" alt="Submit to LinkedIn">
+        </a></div></div></div>
+
+
+	<div id="comments" class="no-js">
+
+	
+	<h4>
+				Comentarios (<span id="comments_counter">0</span>)</h4>
+	<form class="comments_form" action="http://protegetuordenador.com/index.php/component/slicomments/?task=comments.post" method="post" data-logged="0" data-position="top">
+	<input type="hidden" name="cbfa17b12cc1cda01878e0df4df95e0e" value="1">	<input type="hidden" name="article_id" value="627">
+
+			<div class="profile-image-container">
+			<img class="profile-image" src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/00000000.jpg" alt="">
+		</div>
+		<ul class="comments_form_inputs">
+				<li>
+						<label class="login-to-post" for="comments_form_textarea">
+				<a href="http://protegetuordenador.com/index.php/component/users/?view=login&amp;return=aHR0cDovL3Byb3RlZ2V0dW9yZGVuYWRvci5jb20vaW5kZXgucGhwL2Jsb2cvNjI3LW1vbnRhbmRvLXVuLWhvbmV5cG90LWktZGUtaWkjY29tbWVudHM=">Ingrese</a> para comentar!			</label>
+						<textarea id="comments_form_textarea" name="text" class="required minLength:5" disabled data-maxlength="500"></textarea>
+		</li>
+	</ul>
+		<p class="comments-post-buttons">
+		<span><a href="http://protegetuordenador.com/index.php/blog/627-montando-un-honeypot-i-de-ii#" class="cancel-reply">Cancel</a> or </span>
+		<button type="submit" class="comment-submit" disabled data-sending="COM_COMMENTS_LABEL_SENDING">
+			Aceptar		</button>
+	</p>
+</form>
+
+	<ul id="comments_list" class="comment-list">
+		</ul>
+			<div id="pagination" class="clr">
+		<div class="pagination">
+					</div>
+	</div>
+	</div>
+</div> </div></div>	
+    <div id="rightbar-w">
+    <div id="sidebar">
+         	<div class="module">
+        <div class="inner">
+			    <div class="module-body">
+	        
+<div class="mod_fuofb">
+<a href="http://es-es.facebook.com/pages/Protegetuordenadorcom/161774430520716" target="_blank"><img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/find-us-.png" alt="Facebook Image" title="Visit our Facebook page and become a fan." width="100" height="100"></a></div>        </div>
+        </div>
+	</div>
+		<div class="module">
+        <div class="inner">
+			    <div class="module-body">
+	        <div class="bannergroup">
+
+	<div class="banneritem">
+										<a href="http://www.powweb.com/green-certified/" onclick="MyWindow=window.open('http://www.powweb.com/green-certified/','greenCertified','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=550,height=700,left=50,top=50'); return false;"><img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/hosting-.png" border="0"></a>				<div class="clr"></div>
+	</div>
+
+</div>
+        </div>
+        </div>
+	</div>
+	
+    </div>
+    </div>
+    <div class="clr"></div>
+        </div>   		
+        </div>     
+  </div>
+</div>
+<div id="user-bottom">
+<div class="user1">		<div class="moduletable">
+					<div class="bannergroup">
+
+	<div class="banneritem">
+										<a href="http://www.mywot.com/"><img src="Montando%20un%20honeypot%20%28I%20de%20II%29_files/badge80x.png" style="border: 0" alt="Free Internet Security - WOT Web of Trust"></a>				<div class="clr"></div>
+	</div>
+
+</div>
+		</div>
+	</div>
+<div class="user2"></div>
+<div class="user3"></div>
+</div>
+<div id="bottom">
+            <div class="tg">
+            2011 Montando un honeypot (I de II). </div></div>
+<!-- Link protected by copyright law. DO NOT REMOVE! --><div class="design">Powered by <a href="http://www.freshjoomlatemplates.com/" title="joomla 1.7 templates" target="_blank">Joomla 1.7 Templates</a></div>
+</div>
+</body>
+</html>
+<!-- This document saved from http://protegetuordenador.com/index.php/blog/627-montando-un-honeypot-i-de-ii -->

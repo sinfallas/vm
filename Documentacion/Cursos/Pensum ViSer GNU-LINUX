@@ -1,0 +1,170 @@
+Cursos ViSeRProject
+
+- Curso Sistema Operativo GNU/Linux
+
+	Módulos: 7
+	Horas: 96
+
+Módulo I. Principios básicos de Linux (12 horas)
+
+	Linux y el Software Libre:
+ 
+		Software Libre. Filosofía. El proyecto GNU.
+		Tipos de Licencias Libres.
+		Modelos de desarrollo Libre.
+		Historia de Linux.
+		Distribuciones
+
+	Instalación y configuración básica de Linux
+ 
+		Partición del disco
+		Formato de las particiones
+		Configuración de la red
+		Selección de paquetes
+		Configuración del servidor gráfico
+		Configuración de la conexión a Internet
+
+	Entornos de ventanas en el ambiente gráfico
+		Entorno gráfico, entornos de escritorio
+		Servidor gráfico, sistema X
+		Configuración de Xorg
+		Gnome
+		KDE
+
+	Manejadores de Ventanas alternativos
+ 		Uso de efectos visuales en el escritorioSistemas de archivos de Linux
+
+ 	Tipos de sistemas de archivos (ext3, ext4, xfs)
+		 Directorios estándares
+		 Rutas. Propiedades de los archivos. Permisos
+		 Administración de archivos
+		 Montaje de sistemas de archivos, unidades, particiones, dispositivos externos
+
+Módulo II. Administración de Linux Nivel I (16 horas)
+
+	La línea de comandos
+		Ordenes usadas comúnmente
+		Mostrar el contenido de archivos y directorios
+		Pedir ayuda
+		Administración de archivos y directorios
+		Dirigir resultados de las órdenes
+		Filtros
+		Uso de tuberías
+		Modificación de permisos
+		Parada del sistema
+
+	Manejo de usuarios
+		Administración de usuarios y grupos
+		Herramientas gráficas para la administración de usuarios
+		Permisos y accesos al sistema
+		Archivos passwd, shadow y group
+
+	Instalación y desinstalación de Software
+		Sistemas de administración de paquetes
+		Repositorios y otros métodos de búsqueda de software
+		Formatos de paquetes
+		Instalación / Desinstalación manual y gráficas de paquetes
+
+
+Módulo III. Administración de Linux Nivel II. (16 Horas)
+
+	Elementos de programación en bash
+
+		Shell
+		Uso de editores de texto en línea de comando (VIM, nano)
+		Ordenes y programas
+		Definición y manejo de variables de entorno
+		Instrucciones condicionales y de control
+		Programación básica de scripts
+		Uso y manejo de procesos en background
+
+	Manejo de procesos
+		Definición y tipos de procesos
+		Ordenes y señales para el manejo de procesos
+		Manejo de tareas programadas
+		Uso de las órdenes crontab, at
+
+	Scripts de arranque y parada de servicios
+		La secuencia de arranque
+		Niveles de ejecución
+		Scripts de inicio
+		Administración de servicios y demonios del sistema
+		Ordenes relacionadas con el arranque y parada
+		Gestor de arranque GRUB
+		Modos de arranque, uso de splashy, usplash.
+
+	Servicios de impresión
+		Definición, tipos, características, Modelos
+		Instalación, - configuración - Desinstalación
+		Ordenes para el manejo de impresoras, trabajos y colas
+		Administración de CUPS
+
+Módulo IV. Administración Avanzada de Linux (18 Horas)
+
+	Tareas administrativas
+		Archivos de bitácoras y registros del sistema
+		Herramientas para monitoreo de servicios
+		Herramientas para monitoreo recursos del sistema
+		Uso de herramientas para manejar servicios (Webmin)
+		Actualización del kernel
+		Personalizar y optimizar kernel
+		Instalación de módulos y aplicación de parches
+
+	Fundamentos de redes en Linux
+		Configuración básica de una red
+		Configuración de Interfaces de Red
+		Configuración de Rutas, Gateway, DNS
+		Conceptos básicos de seguridad
+		Seguridad Básica de Redes – Iptables
+		Seguridad de servicios y protocolos de redes
+		Servicios de acceso remotoHerramientas para redes
+
+	Herramientas para administración y monitoreo básico de redes y servicios de red
+		Administración remota del sistema
+		Uso de SSH y SCP
+		Uso de VNC
+
+
+Módulo V. Servicios Conexión Redes Internet/Intranet (12 Horas)
+
+	Servicios
+		Configuración de servidores DNS
+		Configuración de servidores DHCP
+		Instalación y configuración de servidor Samba
+		Uso de redes virtuales – OpenVPN
+		Instalación y configuración de servidor de Web (Apache)
+		Instalación y configuración de módulos Apache
+		Instalación y configuración PHP – MYSQL – POSTGRESQL
+		Instalación y configuración dominios virtuales
+		Instalación y configuración de servidor de Correos (Postfix)
+
+	Seguridad
+
+		Seguridad de entornos de desarrollo, monitorización y seguimiento de fallos de seguridad
+
+Módulo VI. OpenLDAP y la integración de servicios (14 Horas)
+	Protocolo LDAP
+		Introducción a LDAP
+		Instalación y configuración de OpenLDAP
+		Creación de directorio para uso de una organización
+		Administración OpenLDAP
+		Instalación y configuración de herramientas administrativas para OpenLDAP
+		Administración básica de directorios LDAP
+		Uso de múltiples Directorios
+		Seguridad básica de OpenLDAPUso de OpenLDAP para integración de servicios
+		Uso de OpenLDAP para autenticación y autorización de usuarios
+		Uso de OpenLDAP con Samba
+		Uso de OpenLDAP con otros servicios
+		Integración de servicios en redes Linux -Windows
+		Uso de OpenLDAP y Samba como PDC
+		Migración de Active Directory a OpenLDAP
+		Herramientas para migración de perfiles y políticas Active Directory a OpenLDAP
+
+Módulo VII. Virtualización (8 Horas)
+	Virtualización
+		Introducción a la virtualización en Linux
+		Herramientas y aplicaciones para virtualización en Linux
+		Instalación y configuración de VirtualBox
+		Instalación y configuración de Qemu
+
+

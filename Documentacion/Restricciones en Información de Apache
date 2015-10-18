@@ -1,0 +1,34 @@
+Restricciones en Información de Apache
+
+Editamos el archivo /etc/apache2/conf.d/security
+
+sudo su
+
+nano /etc/apache2/conf.d/security
+
+Cambiamos o agregamos:
+
+# Por default viene en ServerTokens OS
+ 
+ServerTokens Prod
+
+# Por default en algunos viene en ServerSignature On
+
+ServerSignature Off
+
+# Por default viene en TraceEnable On
+
+TraceEnable Off
+
+# Estas hay que agregarlas al final
+
+Header unset ETag
+
+FileETag None
+
+Guardamos
+
+Reiniciamos Apache
+
+service apache2 restart
+

@@ -1,0 +1,247 @@
+Maquina EMAIL Zimbra
+
+Zimbra (http://www.zimbra.com)
+
+Zimbra proporciona un software de servidor y de cliente de código abierto para mensajería, correo electrónico, colaboración, calendario compartido.
+
+Entre sus características:
+
+- Cliente web basado en Ajax: incluye correo electrónico, contactos, calendario compartido, VoIP, aplicaciones y datos "mezclados" de diversas fuentes de Internet para empresas, y también de autoría de documentos web; todo incluido en el navegador web
+- Compatibilidad con aplicaciones de escritorio: sincronización propia entre ZCS y Microsoft Outlook, Entourage, Apple Mail, Libreta de direcciones e iCal; soporte completo de aplicaciones IMAP/POP
+- Zimbra para móviles: sincronización propia a través del aire con dispositivos de Windows Mobile, Symbian y Palm, sin necesidad de un servidor adicional
+- Servidores ZCS Linux y Mac OS X: con agente de transporte de correo (MTA), antispam, antivirus, directorio, base de datos, herramientas de migración, y consola de administración web basada en Ajax
+
+Entre sus ventajas:
+
+- Flexibilidad – fácilmente personalizarlo según las necesidades.
+- Libertad – se puede usar junto con otras aplicaciones tradicionales.
+- Durabilidad – un servidor de correo electrónico y calendario extraordinariamente fiable y ampliable
+- Bajo mantenimiento 
+
+Una vez se tenga instalado el Ubuntu Server 12.04
+
+Emplearemos todos los comandos desde la terminal
+
+- sudo su 
+
+Ingresar a la carpeta tmp
+
+- cd /var/tmp
+
+Descargar Zimbra
+
+wget -c http://files2.zimbra.com/downloads/8.0.3_GA/zcs-8.0.3_GA_5664.UBUNTU12_64.20130305090204.tgz
+
+Abrir otra terminal 
+
+- sudo su 
+
+Ahora, mientras de descarga la aplicación, debemos "QUITAR" cualquier vestigio de alguna aplicación web, correo etc.
+
+- apt-get remove --purge apache2 apache2-doc apache2-mpm-prefork apache2-utils apache2.2-bin apache2.2-common 
+- apt-get remove --purge bind9 bind9-host bind9utils 
+- apt-get remove --purge sendmail sendmail-base sendmail-bin sendmail-cf sendmail-doc 
+- apt-get remove --purge sensible-mda bsd-mailx rmail samba
+
+Ahora actualizamos
+
+- apt-get update
+
+Instalaremos ssh openssh
+
+Instalamos algunas dependencias necesarias:
+
+- apt-get install netcat-openbsd libgmp3c2 sqlite3 sysstat libperl5.14
+- apt-get -f install libapt-pkg-perl perl libnet-ssleay-perl openssl libauthen-pam-perl libpam-runtime libio-pty-perl apt-show-versions
+
+Instalaremos openssh
+
+- apt-get install openssh-server
+
+Una vez instalado modificamos /etc/network/interfaces
+
+- nano /etc/network/interfaces
+
+Cambiar y/o editar
+
+	# The primary network interface
+        # Cambiar la información por la del servidor
+	 auto eth0 
+	 iface eth0 inet static 
+	 address 192.168.1.110 #IP DEL SERVIDOR
+	 netmask 255.255.255.0 #SUBRED
+	 network 192.168.1.0 #RED
+	 broadcast 192.168.1.255 #BROADCAST 
+	 gateway 192.168.1.1 #PUERTA DE ENLACE
+
+Guardar
+
+Ahora editamos  /etc/hosts
+
+- nano  /etc/hosts
+
+Cambiar y/o editar - añadir
+
+Añadir despues de 127.0.0.X:
+
+	 # cambiar example.com por tu dominio 
+	 # es la que se coloca en la ip IP DEL SERVIDOR en 
+	 # /etc/network/interfaces
+
+ 192.168.1.110 mail.example.com mail 
+
+Guardar
+
+Cambiar example.com por tu dominio
+
+- bash -c "echo mail.example.com > /etc/hostname"
+
+Instalamos Postfix
+
+- apt-get install postfix libsasl2-2 sasl2-bin 
+- dpkg-reconfigure postfix
+
+Verifica que se haya descargado Zimbra, si ya esta todo descargado, procederemos a reiniciar el equipo.
+
+- reboot
+
+Ahora, Ingresar a la carpeta tmp donde descargamos Zimbra y lo descomprimimos
+
+- cd /var/tmp
+
+- tar xzvf zcs-8.0.3_GA_5664.UBUNTU12_64.20130305090204.tgz
+- ls -a
+
+Ingresamos a la carpeta donde esta Zimbra
+
+Por ejemplo:
+
+- cd zcs (colocar la que aparezca similar)
+
+Procedemos a la instalación:
+
+- ./install.sh
+
+Responder las preguntas que vayan apareciendo. Usualmente con Y de si es suficiente, menos en:
+
+Install zimbra-proxy [N]
+Change domain name? [Yes] N
+
+Donde le indicaremos que no
+
+Si aparece un error al intentar resolver el MX de nuestro dominio y pregunta para cambiar el dominio, le indicamos "yes" y escribimos nuestro dominio con los registro MX correctos.
+
+Luego, de culminado este proceso, presione "3" y luego "4" para cambiar la clave del administrador de ZIMBRA
+
+Ahora a configurar 
+
+- su - zimbra
+
+ zmtlsctl https (tardará algo...)
+
+ zmprov mcf zimbraMtaMaxMessageSize 10240000 (máximo peso de email )
+ 
+ zmprov mc default zimbraFeatureInstantNotify TRUE (Instant messenger)
+
+ zmprov mc default zimbraFeatureIMEnabled TRUE ( Instant messenger )
+
+ exit
+ 
+Ahora reconfiguramos:
+
+- zmlocalconfig -e postfix_lmtp_host_lookup=native
+- zmmtactl restart
+
+
+Una vez culminada la instalación oprimimos enter y listo, ya podemos ingresar a nuestro administrador Zimbra desde la URL:
+
+https://direccion-ip:7071
+
+"direccion-ip" es la ip del servidor donde esta montado Zimbra. Realiza los cambios necesarios. Para empezar ir a: Configure > Domains > New
+
+Para solo ingresar https://direccion-ip
+
+Se recomienda instalar WEBMIN para una mejor administración del servidor
+
+Para ello ingresamos a http://www.webmin.com/ y vemos el nombre de la descarga del paqueta
+
+- cd /var/temp 
+- wget -c http://downloads.sourceforge.net/project/webadmin/webmin/1.630/webmin_1.630_all.deb?r=http%3A%2F%2Fwww.webmin.com%2F&ts=1369071706&use_mirror=iweb  
+
+Una vez descargado:
+
+- dpkg --install webmin_1.630_all.deb
+
+Ahora, los certificados que  instala zimbra duran un año aproximadamenre, instalaremos unos de nuevos para mas duración:
+
+- /opt/zimbra/bin/zmcertmgr createca -new
+- /opt/zimbra/bin/zmcertmgr createcrt -new -days 3650
+- /opt/zimbra/bin/zmcertmgr deploycrt self
+- /opt/zimbra/bin/zmcertmgr deployca
+- su - zimbra
+- zmcontrol stop
+- zmcontrol start
+
+Tambíen se puede hacer de la siguiente forma:
+
+- Creación de Certificado
+
+- openssl genrsa -des3 -out server.key 512
+- cp server.key server.key.passphrase
+- openssl rsa -in server.key.passphrase -out server.key
+- openssl req -new -x509 -nodes -sha1 -days 365 /-key server.key -out server.crt
+- openssl req -new -key server.key -out server.csr
+
+Falta solo configurar los DNS, lo haremos usando WEBMIN
+
+Configuracion DNS en WEBMIN
+
+ https://"IP DEL SERVIDOR":10000
+
+ - USER: "USUARIO DE UBUNTU"
+ - PASS: "PASSWORD DE UBUNTU"
+
+ ir a: 
+
+ - UN-USED MODULES
+ - BIND DNS SERVER
+ - Presiona "CLICK HERE" para instalar
+
+ - En SERVERS
+ - BIND DNS SERVER 
+ - CREATE MASTER ZONE
+
+ en: Domain name / Network: "TU DOMINIO".com
+
+ Master Server: ns1."TUDOMINIO".com (sugiero usar los de google 8.8.8.8)
+ email address: "tu email"
+
+ CREATE
+
+ - En Edit Master Zone ( Aparece luego de poner CREATE )
+ - ir a: "Address"
+ - en address: agregar tu "IP PUBLICA"
+ - CREATE
+
+ - EN NAME ALIAS
+ - name: www
+ - Realname "TU DOMINIO".com. ( CON PUNTO AL FINAL )
+ - CREATE
+
+ - Luego volvemos a address
+ -name: ns1
+ -address "IP PUBLICA"
+ -CREATE
+
+ - Ir a Servers/ Bind DNS Server
+ - Arriba a la derecha dice Apply Configuration (hacer click allí)
+ - luego Stop bind y luego start Bind
+
+Verifica el log de Zimbra, ta ayudara en la configuración
+
+- tail -f /var/log/zimbra.log
+
+Más información en la wiki de zimbra: http://wiki.zimbra.com/wiki/Main_Page
+
+Listo Servidor Zimbra configurado
+

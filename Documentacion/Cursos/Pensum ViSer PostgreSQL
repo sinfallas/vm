@@ -1,0 +1,41 @@
+Cursos ViSeRProject
+Pensum ViSer PostgreSQL
+- Curso PostgreSQL
+
+	Módulos: 7
+	Horas: 40
+			
+ Requisitos:
+•	Conocimientos generales uso de bases de datos 
+•	Conocimiento general del uso de Internet, creación de páginas y sitios Web  
+
+ Contenido:
+•	Introducción y Conceptos Básicos
+•	Base de Datos Relacional y Base de Datos Objeto-Relacional
+•	Fundamentos del Lenguaje SQL
+• 	Creación
+–	Selección simple y Selección multitabla
+–	Inserción
+–	Actualización
+–	Eliminación
+–	Importación y Exportación de datos
+–	Administración de la Base de Datos
+
+•	Introducción, principales características y ventajas
+–	Configuración y uso del entorno de trabajo
+–	Definición de una base de datos, tablas, campos, clave primaria y foránea
+–	SQL Shell (psql)
+–	pgAdmin III
+–	Editor SQL
+–	Constructor Gráfico de Consultas
+–	Creación de Sentencias en el SQL Shell y en el Editor Gráfico
+
+•	Diseño de páginas Web que interactúan con PHP y una base de datos PostgreSQL
+ 	Diseño de la página Web, formularios y formato con CSS
+–	Funcionalidades de Consulta a la base de datos
+–	Funcionalidades de Inserción
+–	Funcionalidades de Actualización de datos
+–	Funcionalidades de Eliminación de Registros
+ 
+•	Ejercicios de análisis y diseño de bases de datos con PostgreSQL
+•	Ejercicios de diseño de páginas Web que interactúan con PHP y una base de datos PostgreSQL

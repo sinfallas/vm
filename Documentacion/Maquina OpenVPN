@@ -1,0 +1,283 @@
+Monta tu propia VPN Ubuntu/LinuxMint y derivados
+
+Una red privada virtual (Virtual Private Network) es una tecnología de red que permite una extensión segura de la red local sobre una red pública o no controlada. Ejemplos comunes son la posibilidad de conectar dos o más sucursales de una empresa utilizando como vínculo Internet, permitir a los miembros del equipo de soporte técnico la conexión desde su casa al centro de cómputo, etc. Tambien de esta manera no tendremos que recurrir a usar servicios de terceros cuando necesitemos navegar de forma segura desde sitios públicos.
+
+Al construir una VPN, lo que sea desea es tener la posibilidad de acceder a una red local (protegida detrás de un firewall/gateway) desde Internet (o desde cualquier otra red insegura). El objetivo es que un cliente ubicado físicamente fuera de la red local (y posiblemente a kilómetros de distancia) parezca conectado de forma local. El servidor de VPN es el que posibilita la "extensión" y es quien provee una conexión segura entre el cliente y la red local a través de SSL (al utilizar certificados se obtiene autenticación mutua y confidencialidad).
+
+La conexión VPN a través de Internet es técnicamente una unión wide area network (WAN) entre los sitios pero al usuario le parecer como si fuera un enlace privado— de allí la designación "virtual private network.
+
+Sitio web: https://openvpn.net
+
+Entre sus ventajas:
+
+Integridad, confidencialidad y seguridad de datos.
+
+Las VPN reducen los costes y son sencillas de usar.
+
+Facilita la comunicación entre dos usuarios en lugares distantes.
+
+Entre sus característica básicas de seguridad:
+
+Autentificación y autorización: ¿Quién está del otro lado? Usuario/equipo y qué nivel de acceso debe tener.
+
+Integridad: de que los datos enviados no han sido alterados. Para ello se utiliza funciones de Hash. Los algoritmos de hash más comunes son los Message Digest (MD2 y MD5) y el Secure Hash Algorithm (SHA).
+
+Confidencialidad: Dado que sólo puede ser interpretada por los destinatarios de la misma. Se hace uso de algoritmos de cifrado como Data Encryption Standard (DES), Triple DES (3DES) y Advanced Encryption Standard (AES).
+
+No repudio: es decir, un mensaje tiene que ir firmado, y quien lo firma no puede negar que envió el mensaje.
+
+Requerimientos básicos de una VPN
+
+Por lo general cuando se desea implantar una VPN hay que asegurarse que esta proporcione:
+
+ Identificación de usuario: La VPN debe ser capaz de verificar la identidad de los usuarios y restringir el acceso a la VPN a aquellos usuarios que no estén autorizados. Así mismo, debe proporcionar registros estadísticos que muestren quien acceso, que información y cuando.
+
+Administración de direcciones: La VPN debe establecer una dirección del cliente en la red privada y debe cerciorarse que las direcciones privadas se conserven así.
+
+Codificación de datos: Los datos que se van a transmitir a traves de la red pública deben ser previamente encriptados para que no puedan ser leídos por clientes no autorizados de la red.
+
+Administración de claves:  La VPN debe generar y renovar las claves de codificación para el cliente y el servidor.
+
+Soporte a protocolos múltiples: La VPN debe ser capaz de manejar los protocolos comunes que se utilizan en la red pública. Estos incluyen el protocolo de internet(IP), el intercambio de paquete de internet(IPX) entre otros.
+ Identificación de usuario
+ 
+El protocolo estándar de facto es el IPSEC, pero también están PPTP, L2F, L2TP, SSL/TLS, SSH, etc. Cada uno con sus ventajas y desventajas en cuanto a seguridad, facilidad, mantenimiento y tipos de clientes soportados. En nuestro caso emplearemos PPTP.
+
+Nota: Abrir en la máquina Firewall los puertos: 1194 - 1723 
+
+Instalación:
+
+Una vez tengamos el sistema operativo: Ubuntu Server 12.04
+
+- sudo su
+
+Actualizamos:
+
+-  apt-get update
+
+Ahora instalamos 
+
+- apt-get install openvpn openssh openssh-server pptpd bcrelay dnsmasq
+
+Una vez instalado modificamos /etc/network/interfaces
+
+- nano /etc/network/interfaces
+
+Cambiar y/o editar
+
+	# The primary network interface
+        # Cambiar la información por la del servidor
+	 auto eth0 
+	 iface eth0 inet static 
+	 address 192.168.1.110 #IP DEL SERVIDOR
+	 netmask 255.255.255.0 #SUBRED
+	 network 192.168.1.0 #RED
+	 broadcast 192.168.1.255 #BROADCAST 
+	 gateway 192.168.1.1 #PUERTA DE ENLACE
+
+Guardar
+
+Creamos el Certificado
+
+- openssl genrsa -des3 -out server.key 512
+- cp server.key server.key.passphrase
+- openssl rsa -in server.key.passphrase -out server.key
+- openssl req -new -x509 -nodes -sha1 -days 365 /-key server.key -out server.crt
+- openssl req -new -key server.key -out server.csr
+
+Editamos /etc/dnsmasq.conf
+
+	server=8.8.8.8
+	server=208.67.222.222
+	domain=tudominio.com
+	listen-address=127.0.0.1
+
+Guardar
+
+Modificamos /etc/resolv.conf
+
+search tudominio.com
+nameserver 127.0.0.1
+
+El servidor PPTP se inicia automáticamente, pero hay que configurarlo:
+
+- nano /etc/pptpd.conf
+
+Añadimos o Editamos:
+
+	localip 10.10.10.1 # dirección IP de nuestro servidor dentro de la VPN. 
+	remoteip 10.10.10.100-200,10.10.10.245 # dirección IP de nuestro servidor dentro de la VPN.
+
+Guardamos
+
+Añadimos un usuario (para empezar)
+
+- nano /etc/ppp/chap-secrets 
+
+El formato sería:
+
+	nombre_de_usuario pptpd contraseña *
+
+Añadimos como ejemplo:
+
+	viservpn pptpd C6900321 *
+
+Guardamos
+
+Hacemos un cambio en el iptables (firewall) tanto en el local como en la máquina firewall
+
+	- iptables --insert -t nat -A POSTROUTING -s 10.10.10.0/24 -o eth0 -j MASQUERADE
+        - iptables-save
+
+Activaremos el IP forwarding: /etc/sysctl.conf:
+
+Cambiar y/o editar 
+
+	#net.ipv4.ip_forward=1
+
+Quitando el simbolo # quedaría:
+
+	net.ipv4.ip_forward=1
+
+Guardamos
+
+Ejecutamos
+
+- echo 1 > /proc/sys/net/ipv4/ip_forward
+
+Ahora copiaemos los scripts de configuración de ejemplo al directorio /etc/openvpn:
+
+- cd /usr/share/doc/openvpn/examples/easy-rsa
+- cp -a 2.0/ /etc/openvpn/easy-rsa
+- cd /etc/openvpn/easy-rsa
+
+Estos scripts permiten la creación automática de una autoridad certificante (CA) autofirmada, lo cual simplifica mucho la instalación. Ya que OpenVPN está basado en SSL, se utiliza openssl para la autenticación mutua de clientes y servidores. La CA se utiliza para expedir certificados para el servidor de VPN y los clientes.
+
+Editamos vars y Configuramos correctamente los parámetros KEY_COUNTRY, KEY_PROVINCE, KEY_CITY, KEY_ORG, y KEY_EMAIL.
+
+- nano vars
+
+Coloque los valores pertinentes.
+
+Ahora modifiquemos  whichopensslcnf
+
+- nano whichopensslcnf
+
+Eliminar todas las apariciones de la siguiente cadena (en la versión "OpenVPN 2.2.1 x86_64-linux-gnu" son 3 apariciones):
+
+[[:alnum:]]
+
+Luego de configurar el archivo vars es posible generar el certificado y clave para la Autoridad Certificante (CA):
+
+- . ./vars && source vars
+- ./clean-all
+- ./build-ca
+
+Generamos el certificado y clave para el servidor de VPN (colocar los mismos valores que se colocaron más arriba):
+
+./build-key-server server
+
+Generar los certificados para los clientes (es importante que los certificados de los clientes y del servidor estén firmados por la misma CA):
+
+OJO -> pkitools  para crear los certificados de clientes y servidor
+
+#
+- ./build-key client1
+- ./build-key client2
+- ./build-key client3
+
+#
+Nota: cada vez que se reinicia la sesión, se debe ejecutar ". ./var" para configurar las variables de entorno nuevamente.
+
+Responder 'y' dos veces para firmar y commit del certificado.
+
+Finalmente se deben generar los parámetros Diffie-Hellman:
+
+- ./build-dh
+
+Despúes de construir nuestra PKI (Public Key Infrastructure), es decir nuestra infraestructura de autenticación y encriptación mediante clave pública, se deben copiar los archivos de configuración de ejemplo al directorio /etc/openvpn:
+
+cp -a /usr/share/doc/openvpn/examples/sample-config-files/ /etc/openvpn/
+
+CONFIGURAR SERVIDOR
+
+Descomprimir el archivo de configuración del servidor:
+
+- cd /etc/openvpn/sample-config-files/
+- gunzip server.conf.gz
+
+Editar el archivo de configuración del servidor:
+
+- nano server.conf
+
+Modificar las siguientes líneas:
+
+	proto tcp
+	;proto udp
+
+	ca easy-rsa/keys/ca.crt
+	cert easy-rsa/keys/server.crt
+	key easy-rsa/keys/server.key  # This file should be kept secret
+
+	dh easy-rsa/keys/dh1024.pem
+
+	server 10.10.10.0 255.255.255.0
+
+
+De esta forma el servidor dará acceso a la red 10.10.10.0/24 y tomará la dirección IP 10.10.10.1 (los clientes tendrán una IP en el rango 10.10.10.2 a 10.10.10.254).
+
+Si es necesario enviar reglas de ruteo a los clientes se debe agregar (por ejemplo para poder llegar a la red 10.10.10.0/24 que se encuentra detrás de la VPN):
+push "route 10.10.10.0 255.255.255.0"
+
+Guardar
+
+Por último copiar el archivo de configuración al directorio /etc/openvpn:
+
+- cp server.conf ../
+- cd /etc/openvpn
+
+CONFIGURAR CLIENTES (debe hacerse en todos)
+
+Editar el archivo de configuración de los clientes:
+
+- cd /etc/openvpn/sample-config-files
+- nano client.conf
+
+Modificar las siguientes líneas:
+
+	proto tcp
+	;proto udp
+
+	remote 192.168.100.120 1194
+
+Guardar
+
+En este ejemplo la dirección IP 192.168.100.120 es la dirección en la cual el servidor escucha pedidos de conexión a la VPN 10.10.10.0/24 en el puerto 1194 (puerto por defecto de OpenVPN).
+
+Empaquetar el archivo de configuración junto con los certificados y clave:
+
+- cd /etc/openvpn
+- mkdir client1
+- cp sample-config-files/client.conf client1/
+- cp easy-rsa/keys/ca.crt client1/
+- cp easy-rsa/keys/client1.crt client1/client.crt
+- cp easy-rsa/keys/client1.key client1/client.key
+- zip -Z deflate -r client1.zip client1/*
+
+INICIAR SERVIDOR VPN:
+
+- cd /etc/openvpn/
+- openvpn server.conf
+
+Una vez que estamos seguros que funciona podemos levantar el servicio con lo siguiente:
+
+- service openvpn  start
+
+Reiniciamos el equipo
+
+- reboot
+
+Listo tenemos el servidor VPN 
+
+
+

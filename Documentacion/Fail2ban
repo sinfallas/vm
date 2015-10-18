@@ -1,0 +1,76 @@
+Fail2ban
+
+Es una utilidad que se ejecuta en el servidor que funge de monitor de los archivos de log del sistema, cuando detecta un algo sospechoso hacia alguno de los servicios de los que está pendiente banea la IP incursora.
+
+La configuración default de Fail2ban monitoriza solo el servicio ssh, pero puede además monitorizar, el ftp, el mail, servicio web, etc, si se activa y configura adecuadamente.
+
+Instalación y configuración
+
+sudo su
+
+aptitude install fail2ban
+
+Copiamos la configuración por default an nuevo archivo que es con el que trabajaremos
+
+cp /etc/fail2ban/jail.conf  /etc/fail2ban/jail.local
+
+Editamos
+
+nano /etc/fail2ban/jail.local
+
+Cambiamos:
+
+# Tiempo en segundos 
+bantime  = 600
+
+por 
+
+# 1 semana
+bantime  = 86400
+
+Cambiar las entradas maxretry
+
+maxretry = 5  
+
+Menos la de la seccion ssh 
+
+maxretry = 3 
+
+Cambiar:
+
+destemail = root@localhost
+
+Por el email a donde se enviará las notificaciones
+
+Podemos pedir que el informe enviado a nuestro correo sea bastante completo cambiando la línea:
+
+action = %(action_)s
+
+por:
+
+action = %(action_mwl)s
+
+Activemos el/los servicios que deseamos monitorear, cambiando:
+
+enabled  = false 
+
+por 
+
+enabled  = true
+
+Si se usa shorewall, definir el "banaction" a "shorewall", sino creará sus propias cadenas iptables
+
+banaction = shorewall
+
+guardar
+
+Le damos restart al servicio
+
+service fail2ban restart
+
+Para eliminar alguna entrada del fail2ban
+
+iptables -D fail2ban-sasl -s xxx.xxx.xxx.xxx -j DROP
+
+donde xxx.xxx.xxx.xxx es la IP a desbanear
+
