@@ -1,4 +1,22 @@
-commit 18321e9fd3f7442a4508b12798297da29fe32ef1 (HEAD, origin/master, origin/HEAD, master)
+commit 08162efcc282695c13e2302c4c783fe83f409d6e (HEAD, origin/master, origin/HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Sat Oct 17 20:34:57 2015 -0430
+
+    * se agrega documentacion relacionada
+
+commit a8b88a649389526105bd093e447619821817b276
+Author: jose perez <sinfallas@gmail.com>
+Date:   Tue Oct 13 21:57:25 2015 -0430
+
+    coveralls
+
+commit 74de7f9908bb6ccd7cc2c93423cc0ad9fbdb1257
+Author: jose perez <sinfallas@gmail.com>
+Date:   Mon Oct 12 13:25:52 2015 -0430
+
+    * changelog
+
+commit 18321e9fd3f7442a4508b12798297da29fe32ef1
 Author: jose perez <sinfallas@gmail.com>
 Date:   Mon Oct 12 13:25:13 2015 -0430
 
