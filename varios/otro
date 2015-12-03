@@ -1,0 +1,41 @@
+Tomar en cuenta dos herramientas importantes para viser
+Ossec
+http://www.ossec.net/ y 
+
+Bastille Linux
+http://www.bastille-unix.org/
+
+---------------
+
+Igualmente instaurar en el cron el eliminado de los temp por lo menos cada 6 horas de esa forma se minimiza la incursion en esa locacion
+
+----------------
+
+Ademas, limpiar la RAM de vez en cuando (recomiendo cada 72 horas), de esa forma se minimiza riesgo de injecciones extrañas
+
+sync
+sysctl -w vm.drop_caches=3
+
+------------------------------------------------------------
+
+http://panel.local/zpanel
+
+user: zadmin
+pass: password
+
+--------------------------------------------------------
+
+Apache Module mod_rewrite: http://httpd.apache.org/docs/current/mod/mod_rewrite.html
+
+------------------------------------------------------------
+
+Crear usuario para servicio WEB
+Crear grupos web
+
+------------------------------------------------------------
+
+Verificar httptrace http://www.cgisecurity.com/questions/httptrace.shtml ver tambien http://perishablepress.com/disable-trace-and-track-for-better-security/
+
+------------------------------------------------------------
+
+ISPConfig

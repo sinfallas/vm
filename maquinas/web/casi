@@ -1,0 +1,142 @@
+
+-Creación Usuario MySQL
+
+login: web
+password: j9Lsa5anCpFSGpR6
+Privilegios TODOS
+
+Consultas SQL:
+CREATE USER 'web'@'%' IDENTIFIED BY '***';
+GRANT ALL PRIVILEGES ON * . * TO 'web'@'%' IDENTIFIED BY '***' WITH GRANT OPTION MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;
+
+CREATE USER 'web'@'localhost' IDENTIFIED BY '***';
+
+GRANT ALL PRIVILEGES ON * . * TO 'web'@'localhost' IDENTIFIED BY '***' WITH GRANT OPTION MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;
+
+- Creación de Certificado
+
+(En esta maquina: por ejemplo ->
+Phrase: ubuntuserverweb
+Password: 6900321
+Entidad: VaSlibre)
+
+- Incluir estas directivas dentro del código del servidor virtual de Apache que se encargue de HTTPS:
+
+SSLEngine on
+SSLCertificateFile /etc/apache2/ssl.crt/server.crt
+SSLCertificateKeyFile /etc/apache2/ssl.crt/server.key
+
+Ejemplo:
+Listen 80 443
+
+NameVirtualHost aqui-mi-ip-publica:443
+
+<VirtualHost IP-DE-LA-MAQUINA:443>
+ServerAdmin webmaster@vaslibre.org.ve
+DocumentRoot /var/www/virtuals/https.ejemplo.org
+ServerName https.ejemplo.org
+<Directory /var/www/virtuals/https.ejemplo.org>
+Options FollowSymLinks
+AllowOverride All
+Order allow,deny
+Allow from All
+</Directory>
+
+SSLEngine on
+SSLCertificateFile cert/server.crt
+SSLCertificateKeyFile cert/server.key
+ErrorLog logs/https.ejemplo.org_ssl-error_log
+CustomLog logs/https.ejemplo.org_ssl-access_log common
+</VirtualHost>
+- Guardar
+- service apache2 restart
+
+- Trabajar con sitios web
+- sudo mkdir /var/www/sitios
+- sudo cd /etc/apache2/sites-available/
+- sudo cp default sitios
+- sudo nano sitios
+- sudo a2ensite sitios
+- sudo service apache restart
+- +* Probar con http://sitios
+
+- Editar
+- sudo nano /etc/apache2/ports.conf
+
+# Añadimos los servidores virtuales:
+Listen 80
+#Listen 443
+
+NameVirtualHost *:80
+NameVirtualHost *:443
+- Guardar
+- sudo service apache reload
+- Deshabilitar 'allow_url_fopen' y 'allow_url_include' (PHP5) in php.ini.
+- sudo nano /etc/php5/apache2/php.ini
+- allow_url_fopen = Off
+- allow_url_include = Off
+- Editar y añadir en
+- sudo nano /etc/apache2/sites-available/default
+- Al principio dentro de <Directory /> colocar:
+Options +FollowSymlinks
+ServerSignature Off
+SetEnv TZ America/Caracas
+RewriteEngine On
+
+RewriteCond %{QUERY_STRING} mosConfig_[a-zA-Z_]{1,21}(=|\%3D) [OR]
+RewriteCond %{QUERY_STRING} base64_encode.*\(.*\) [OR]
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{HTTP_USER_AGENT} libwww [NC,OR]
+RewriteCond %{QUERY_STRING} ^(.*)=http [NC]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+php_flag zlib.output_compression On
+php_value zlib.output_compression_level 2
+SetOutputFilter DEFLATE
+Header unset ETag
+Header append Vary User-Agent
+FileETag None
+SetEnv SERVER_ADMIN webmaster@vaslibre.org.ve
+
+<Files .htaccess>
+order allow,deny
+deny from all
+</Files>
+
+<Files php.ini>
+order allow,deny
+deny from all
+</Files>
+- Guardar
+- sudo service apache restart
+
+- Instalación OpenSSH - Instalado por defecto SFTP
+- sudo apt-get install openssh-server
+
+
+* POR HACER EN ESTA MAQUINA
+
+- Securizar ssh
+- Tunear MySQL
+- Tunear PostgreSQL
+- Crear usuario para servicio WEB
+- Crear grupos web
+- Instalar Panel WEB http://www.openpanel.com/download/openpanel-download/
+- Verificar httptrace http://www.cgisecurity.com/questions/httptrace.shtml ver tambien http://perishablepress.com/disable-trace-and-track-for-better-security/
+
+***************************************************************************
+Bibliografía:
+http://www.instigado.net/docus/ssl/index.html
+http://tuxtweaks.com/2012/07/install-ssh-sftp-server-ubuntu-linux-mint/
+http://www.thefanclub.co.za/how-to/how-install-apache2-modsecurity-and-modevasive-ubuntu-1204-lts-server
+https://developers.google.com/speed/spdy/mod_spdy/php
+https://developers.google.com/speed/spdy/
+http://code.google.com/p/mod-spdy/wiki/ConfigOptions
+https://developers.google.com/speed/spdy/mod_spdy/php
+http://httpd.apache.org/docs/2.2/mod/mod_mem_cache.html
+http://www.markround.com/archives/33-Apache-mod_proxy-balancing-with-PHP-sticky-sessions.html
+http://www.howtoforge.com/embedding-python-in-apache2-with-mod_python-debian-ubuntu-fedora-centos-mandriva-opensuse
+http://www.mosets.com/help/kb/mosets-tree/24
