@@ -1,4 +1,16 @@
-commit 4eaa1f5f5887f477ad955060db4a5690f7aec31c (HEAD, origin/master, origin/HEAD, master)
+commit 2f16571ce041491864ea75a976278a56e13c1de6 (HEAD, origin/master, origin/HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Wed Dec 2 21:38:52 2015 -0430
+
+    * se eliminan los script genmac y genmac2
+
+commit 199a3ea025351d00865e07df3099f2a3fd81496b
+Author: jose perez <sinfallas@gmail.com>
+Date:   Wed Dec 2 21:22:19 2015 -0430
+
+    * changelog
+
+commit 4eaa1f5f5887f477ad955060db4a5690f7aec31c
 Author: jose perez <sinfallas@gmail.com>
 Date:   Wed Dec 2 21:21:01 2015 -0430
 
