@@ -1,10 +1,22 @@
-commit 526d105622bbf59065b4223a0337326257121088 (HEAD, master)
+commit 4eaa1f5f5887f477ad955060db4a5690f7aec31c (HEAD, origin/master, origin/HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Wed Dec 2 21:21:01 2015 -0430
+
+    * se elimina el directorio pxe
+
+commit 07e206558cf204a4dd845e26f4e442b2da5487dd
+Author: jose perez <sinfallas@gmail.com>
+Date:   Wed Dec 2 21:18:55 2015 -0430
+
+    * changelog
+
+commit 526d105622bbf59065b4223a0337326257121088
 Author: jose perez <sinfallas@gmail.com>
 Date:   Wed Dec 2 21:18:12 2015 -0430
 
     * se elimina el directorio web
 
-commit 1ca2a4e7626cba95f564e54e01468e07fe986dc2 (tag: v0.2, origin/master, origin/HEAD)
+commit 1ca2a4e7626cba95f564e54e01468e07fe986dc2 (tag: v0.2)
 Author: jose perez <sinfallas@gmail.com>
 Date:   Sat Oct 17 20:35:38 2015 -0430
 
