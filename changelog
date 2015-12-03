@@ -1,4 +1,16 @@
-commit e0a6b01a05b1893db6a37e2f39bfb3e8716be0c6 (HEAD, origin/master, origin/HEAD, master)
+commit 40cdc53dcefb0d6e244849121e96eec2638c7610 (HEAD, origin/master, origin/HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Thu Dec 3 16:28:43 2015 -0430
+
+    * se borra un archivo innecesario
+
+commit d7bd107df8ebf54f94f38109b91614681257cead
+Author: jose perez <sinfallas@gmail.com>
+Date:   Thu Dec 3 13:06:24 2015 -0430
+
+    * changelog
+
+commit e0a6b01a05b1893db6a37e2f39bfb3e8716be0c6
 Author: jose perez <sinfallas@gmail.com>
 Date:   Thu Dec 3 12:58:41 2015 -0430
 
