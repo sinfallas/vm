@@ -1,4 +1,16 @@
-commit 08162efcc282695c13e2302c4c783fe83f409d6e (HEAD, origin/master, origin/HEAD, master)
+commit 526d105622bbf59065b4223a0337326257121088 (HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Wed Dec 2 21:18:12 2015 -0430
+
+    * se elimina el directorio web
+
+commit 1ca2a4e7626cba95f564e54e01468e07fe986dc2 (tag: v0.2, origin/master, origin/HEAD)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Sat Oct 17 20:35:38 2015 -0430
+
+    * changelog
+
+commit 08162efcc282695c13e2302c4c783fe83f409d6e
 Author: jose perez <sinfallas@gmail.com>
 Date:   Sat Oct 17 20:34:57 2015 -0430
 
