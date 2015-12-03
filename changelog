@@ -1,4 +1,16 @@
-commit 40cdc53dcefb0d6e244849121e96eec2638c7610 (HEAD, origin/master, origin/HEAD, master)
+commit 96364fdfa9d7cbc3c29775012307d5926de61e7b (HEAD, origin/master, origin/HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Thu Dec 3 16:40:13 2015 -0430
+
+    * se agregan mas archivos
+
+commit 8b64b157f005348b688712dc6d2b3df9cf98a4cb
+Author: jose perez <sinfallas@gmail.com>
+Date:   Thu Dec 3 16:29:23 2015 -0430
+
+    * changelog
+
+commit 40cdc53dcefb0d6e244849121e96eec2638c7610
 Author: jose perez <sinfallas@gmail.com>
 Date:   Thu Dec 3 16:28:43 2015 -0430
 
