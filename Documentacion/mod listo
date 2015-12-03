@@ -1,0 +1,548 @@
+con 2.1 gb de swap se pueden mantener hasta 20 vm
+
+hay que cambiar el programa de firewall actrual por el CFS ya que permite una adaptacion rapida a los ataques, tambien podemos utilizar SNORT
+
+poner el tiempo del grub en 2
+
+eliminar auntenticacion por user, usar certificado
+
+switch1 es para area de trabajo
+switch2 es para el honeypot
+swithc3 es para el trafico de gestion (ese equipo ya no existe)
+
+----------------------------------------
+
+ejecutar y hacer
+
+mysql_secure_installation
+
+mysql -u root -p
+cd usr/local/mysql
+mysql -u root -p < share/innodb_memcached_config.sql
+mysql> INSTALL PLUGIN daemon_memcached SONAME 'libmemcached.so';
+
+verificar q este instalado
+mysql> show plugins;
+
+mysql> quit;
+
+-----------------------------
+
+mod security
+
+------------------------------
+
+configurar denyhost
+
+----------------------------
+
+añadir o modificar las lineas /etc/mysql/my.cnf
+que tenga estos valores
+
+max_connections = 500
+max_user_connections = 500
+
+---------------------------------
+
+maquina de gestion
+
+este equipo esta conectado al switch de la red virtual primaria (no tiene acceso a la red del honeypot), a su vez debe exister algun vinculo con la maquina host (todavia no se como establecerlo)
+
+
+la funcion principal de este equipo es el de servir de pasarela ssh hacia los demas equipos, esto se hace para impedir que tanto la maquina de firewall como la maquina host tengas acceso a la esos equipos, lo que significa que dichos equipos (ejemplo apache) no acepta conexiones desde otro IP o MAC que no corresponda con la de la maquina de gestion
+
+
+la conexion con el host se utiliza para gestionar las creacion o restauracion de las backup, esto se realizara mediante un comando planificado en gestion y que se pasara al host
+
+
+tambien puede utilizarce esa conexion con host para verificar la integridad de las VM mediante el script que sinfallas hizo, este script verifica la firma MD5 de los archivos de imagen de disco de las vm y la verificacion del proceso de cada una de la VM se realiza mediante APPARMOR (en la maquina host) y rootkin hunter en la maquina de gestion.
+
+
+en caso de que alguna de las VM resulte comprometida el sistema realizara una serie de proceso para tratar de levantar la VM
+
+
+1) en caso de que el equipo no responda el watchdog correspondiente reiniciara dicho equipo y la maquina de gestion realizara la alerta correspondiente
+2) en caso de que el equipo falle la verificacion de la firma md5 en su archivo de imagen, la maquina de gestion dara de baja dicho equipo y dara la orden al host para poner en linea una copia limpia de dicha maquina, al estar los datos alojados en el NAS virtual las posibles perdidas son minimizadas,
+3) en caso de que la maquina de firewall se vea comprometida, la de gestion puede eliminarla de la red y realizar la restauracion correspondiente; en caso de fallar puede dar la orden a la vm con menos carga de trabajo que tome el lugar del firewall y ademas siga cumpliendo su funcion principal
+
+
+la maquina de gestion hara un reporte de las fallas y posibles vectores de ataque a un servidor central (externo a las empresas y controlados por nosotros), esto nos permitira crear firmas de actualizacion y asi proteger a las demas plataformas con la experiencia ganada de falla y ataques
+
+
+el servidor central tambien hara notificaciones tipo push a las maquinas de gestion ubicadas en las diferentes plataformas, esto nos permite ahorrar ancho de banda ya que las maquinas dentro de cada una de las celulas de viser no deben utilizar el enlace a internet para comprobar nuevas versiones de software
+
+-----------------------------------------
+
+instalar ClamAV en la maquina de gestion
+
+---------------------------------------
+
+rootkit hunter
+
+------------------
+
+/etc/ssh/sshd_config
+
+StrictModes  no
+AuthorizedKeyfile %h/.ssh/authorized_keys
+PasswordAuthentication no
+UsePAM no
+
+apt-get -y install nfs-common
+
+
+/tmp /var/tmp bind bind 0 0
+
+192.168.100.10:/home/server /home/server nfs4 auto,soft,timeo=200,noac,sharecache,intr 0 0
+
+------------------------
+
+eliminar entradas ssh en firewall menos para gestion
+-----------------------------
+
+cambie -cpu kvm64,+ssse3,+sse4.1,+sse4.2,+x2apic por -cpu host
+
+----------------------------------
+
+para archivo de actualizacion en fstab en gestion
+
+tmpfs
+----------------------------------------------------
+
+Utilizar .img para las actualizaciones y luego de estar listo clean; la imagen estara conectada a las maq vir como DD controlado por la maq gestion, hacer script actualizaciones remotas de viser
+
+192.168.100.10:/var/cache/apt/archives /var/cache/apt/archives nfs4 auto,soft,timeo=200,noac,sharecache,intr 0 0
+----------------------------------------------------
+exports en gestion
+
+/home/server/ *(rw,insecure,async,no_subtree_check)
+/var/cache/apt/archives/ *(rw,insecure,async,no_subtree_check,no_root_squash,fsid=20)
+
+echo "ALL : ALL" >> /etc/hosts.allow
+
+apt-get -y install nfs-common nfs-kernel-server
+------------------------------------------------------
+
+usar PCI pass-through en la maquina de firewall (incompatible con la cpu)
+
+-------------------------------------------
+
+apt-get -y install libaio1 linux-virtual (se elimino linux-virtual)
+
+---------------------------------------------
+
+elimine el soporte de ipxe y kvm-ipxe para que booteen mas rapido
+
+---------------------------------------------
+
+la segunda red fue eliminada por problemas de enrutamiento
+
+----------------------------------------------
+
+mpich2 en la vm de pxe, faltan los nodos secundarios
+
+-----------------------------------------------
+
+echo 20000 > /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan
+echo 20000 > /sys/kernel/mm/ksm/pages_to_scan
+
+-----------------------------------------------
+
+script de vefificacion de los switch virtuales y maquinas mediante PID, tambien verifica el servicio
+
+-----------------------------------------------
+
+modificar el script de verificacion para evitar arranques accidentales, usando /run/viser.lock
+
+------------------------------------------------
+
+Desactivar funciones de Ctrl+Alt+Del de la maquina fisica (hacer en produccion)
+
+----------------------------------------------
+
+crear y subir script de verificacion de enlace en firewall
+
+----------------------------------------------
+
+se elimino webmin de la maquina firewall
+
+-----------------------------------------
+
+se sustituyo -vga std por -vga cirrus para mejorar el rendimiento
+
+----------------------------------------
+
+se configuro por completo el watchdog, i6300 in the blacklist (/etc/modprobe.d/blacklist-watchdog.conf)
+
+------------------------------------------
+
+armar directorio de respaldo de config en host
+
+------------------------------------------
+
+se desactivo el soporte para hpet con -no-hpet en el script de arranque y se agrego -rtc base=localtime,clock=host
+
+--------------------------------
+
+se elimino la segunda red de la pc gestion
+-net nic,vlan=2,name=eth2,model=virtio,macaddr=54:52:00:6E:6A:66 -net vde,vlan=2,sock=/tmp/switch2/
+
+----------------------------------
+
+aio=threads,cache=writeback (mejorar rendimiento)
+
+----------------------------------
+
+se elimino -spice disable-ticketing,disable-copy-paste,ipv4,port=9500 -vga cirrus por -display none -vga none en todos las vm menos en gestion 
+
+----------------------------------
+
+GRUB_RECORDFAIL_TIMEOUT=0 en los grub de todas las vm (hace que las vm no se queden en el grub despues de un mal apagado)
+
+-------------------------------------
+
+se agrego -bios /home/sinfallas/Dropbox/viser/maquinas/bios.bin-1.7.2.bin al script de arranque para cargar una version actualizada de la bios
+
+-option-rom /usr/share/seabios/bios.bin (se elimino xq sirve como complemento y no como respaldo)
+
+-------------------------------------
+
+nuevas metricas y net.isr.direct=1 (esta opcion da error)
+
+-------------------------------------
+
+Maquina Mail ViSeR
+
+mkdir mail
+
+cd mail
+
+sudo su
+
+aptitude install postfix
+aptitude install libsasl2-2
+aptitude install sasl2-bin
+
+
+dpkg-reconfigure postfix
+
+Configuracion:
+        General type of mail configuration: Internet Site
+        NONE doesn't appear to be requested in current config
+        System mail name: server1.example.com
+        Root and postmaster mail recipient: <admin_user_name>
+        Other destinations for mail: server1.example.com, example.com, localhost.example.com, localhost
+        Force synchronous updates on mail queue?: No
+        Local networks: 127.0.0.0/8
+        Yes doesn't appear to be requested in current config
+        Mailbox size limit (bytes): 520000
+        Local address extension character: +
+        Internet protocols to use: all
+
+postconf -e 'home_mailbox = Maildir/'
+postconf -e 'mailbox_command ='
+
+Configure Postfix to do SMTP AUTH using SASL (saslauthd):
+
+postconf -e 'smtpd_sasl_local_domain ='
+postconf -e 'smtpd_sasl_auth_enable = yes'
+postconf -e 'smtpd_sasl_security_options = noanonymous'
+postconf -e 'broken_sasl_auth_clients = yes'
+postconf -e 'smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination'
+postconf -e 'inet_interfaces = all'
+
+Add the following lines in:
+nano /etc/postfix/sasl/smtpd.conf
+
+pwcheck_method: saslauthd
+mech_list: plain login
+
+Salvar
+
+Generate certificates to be used for TLS encryption and/or certificate Authentication:
+
+touch smtpd.key
+chmod 600 smtpd.key
+openssl genrsa 1024 > smtpd.key
+openssl req -new -key smtpd.key -x509 -days 3650 -out smtpd.crt
+
+        Country Name (2 letter code) [AU]:VE
+        State or Province Name (full name) [Some-State]:Carabobo
+        Locality Name (eg, city) []:Valencia
+        Organization Name (eg, company) [Internet Widgits Pty Ltd]:ViSeRProject
+        Organizational Unit Name (eg, section) []:ViSeR
+        Common Name (e.g. server FQDN or YOUR name) []:ViSeR
+        Email Address []:info@viserproject.com
+
+openssl req -new -x509 -extensions v3_ca -keyout cakey.pem -out cacert.pem -days 3650
+
+        Country Name (2 letter code) [AU]:VE
+        State or Province Name (full name) [Some-State]:Carabobo
+        Locality Name (eg, city) []:Valencia
+        Organization Name (eg, company) [Internet Widgits Pty Ltd]:ViSeRProject
+        Organizational Unit Name (eg, section) []:ViSeR
+        Common Name (e.g. server FQDN or YOUR name) []:ViSeR
+        Email Address []:info@viserproject.com
+
+
+mv smtpd.key /etc/ssl/private/
+mv smtpd.crt /etc/ssl/certs/
+mv cakey.pem /etc/ssl/private/
+mv cacert.pem /etc/ssl/certs/
+
+Configure Postfix to do TLS encryption for both incoming and outgoing mail:
+
+postconf -e 'smtp_tls_security_level = may'
+postconf -e 'smtpd_tls_security_level = may'
+postconf -e 'smtpd_tls_auth_only = no'
+postconf -e 'smtp_tls_note_starttls_offer = yes'
+postconf -e 'smtpd_tls_key_file = /etc/ssl/private/smtpd.key'
+postconf -e 'smtpd_tls_cert_file = /etc/ssl/certs/smtpd.crt'
+postconf -e 'smtpd_tls_CAfile = /etc/ssl/certs/cacert.pem'
+postconf -e 'smtpd_tls_loglevel = 1'
+postconf -e 'smtpd_tls_received_header = yes'
+postconf -e 'smtpd_tls_session_cache_timeout = 3600s'
+postconf -e 'tls_random_source = dev:/dev/urandom'
+postconf -e 'myhostname = mail.viserproject.com'
+
+service postfix restart
+
+edit /etc/default/saslauthd and set START=yes
+nano /etc/default/saslauthd
+
+dpkg-statoverride --force --update --add root sasl 755 /var/spool/postfix/var/run/saslauthd
+
+service saslauthd start
+
+/etc/postfix/master.cf  # Colocar puerto 587, descomentando submission inet
+nano /etc/postfix/master.cf
+
+
+use ClamSMTP
+
+LEer esto para Gestion
+https://help.ubuntu.com/community/PostfixVirtualMailBoxClamSmtpHowto#Installing_ClamSMTP
+
+
+ (SPF)
+
+apt-get install postfix-policyd-spf-python
+apt-get install postfix-policyd-spf-perl
+
+nano /etc/postfix/master.cf  -- Añadir
+
+
+policy-spf  unix  -       n       n       -       -       spawn
+     user=nobody argv=/usr/bin/policyd-spf
+
+Editar
+nano /etc/postfix/main.cf
+
+colocar
+
+smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination, check_policy_service unix:private/policy-spf
+
+service postfix stop
+service postfix start
+
+DKIM
+
+aptitude install opendkim opendkim-tools
+
+Editar
+
+nano /etc/postfix/main.cf  y agregar
+
+# DKIM
+milter_default_action = accept
+milter_protocol = 2
+smtpd_milters = inet:localhost:8891,inet:localhost:8892
+non_smtpd_milters = inet:localhost:8891,inet:localhost:88
+
+opendkim-genkey -t -s mail -d ubuntu.ro
+mkdir  /etc/mail/
+cp mail.private /etc/mail/dkim.key
+cd /etc/mail
+nano mail.txt
+ agrgear
+
+mail._domainkey.ubuntu.ro. IN TXT "v=DKIM1; g=*; k=rsa; p=PpYHdE2tevfEpvL1Tk2dDYv0pF28/f 5MxU83x/0bsn4R4p7waPaz1IbOGs/6bm5QIDAQAB" ; ----- DKIM mail for ubuntu.ro
+
+guardar
+
+service opendkim start
+
+service postfix restart
+
+DomainKeys
+aptitude install dk-filter
+
+openssl genrsa -out private.key 1024
+openssl rsa -in private.key -out public.key -pubout -outform PEM
+
+Crear
+
+/etc/default/ilist
+
+añadir
+
+#gestion
+192.168.100.10
+#apache
+192.168.100.2
+#firewall
+192.68.100.1
+
+Guardar
+
+DAEMON_OPTS="$DAEMON_OPTS -d domain.tld -s /etc/mail/domainkey.key -S mail -i /etc/default/ilist"
+
+_domainkey.domain.tld. IN TXT "t=y; o=~;
+
+mail._domainkey.domain.tld. IN TXT "k=rsa; t=y; p=PpYHdE2tevfEpvL1Tk2dDYv0pF28/f 5MxU83x/0bsn4R4p7waPaz1IbOGs/6bm5QIDAQAB"
+
+service dk-filter start
+
+service postfix restart
+
+spamassassin
+
+apt-get install spamassassin spamc
+
+groupadd -g 5001 spamd
+useradd -u 5001 -g spamd -s /sbin/nologin -d /var/lib/spamassassin spamd
+mkdir /var/lib/spamassassin
+chown spamd:spamd /var/lib/spamassassin
+
+nano /etc/default/spamassassin
+
+cambiar por
+
+ENABLED=1
+SAHOME="/var/lib/spamassassin/"
+OPTIONS="--create-prefs --max-children 5 --username spamd --helper-home-dir ${SAHOME} -s ${SAHOME}spamd.log"
+PIDFILE="${SAHOME}spamd.pid"
+CRON=1
+
+nano /etc/spamassassin/local.cf
+
+añadir o editar
+
+rewrite_header Subject ***SPAM***
+report_safe 0
+required_score 5.0
+use_bayes 1
+bayes_auto_learn 1
+
+Guardar
+
+service spamassassin start
+
+
+DovecotLDAP
+
+apt-get install dovecot
+
+DovecotSASL
+
+apt-get install dovecot-core
+
+postconf -e 'smtpd_sasl_type = dovecot'
+postconf -e 'smtpd_sasl_path = private/auth-client'
+postconf -e 'smtpd_sasl_auth_enable = yes'
+
+service postfix restart
+
+-----------------------------
+
+se cambio:
+
+auto tap0
+iface tap0 inet manual
+tunctl_user sinfallas
+
+auto br0
+iface br0 inet static
+address 192.168.0.11
+network 192.168.0.0
+netmask 255.255.255.0
+broadcast 192.168.0.255
+gateway 192.168.0.1
+bridge_ports eth0 tap0
+bridge_stp off
+bridge_fd 0
+bridge_maxwait 0
+bridge_hello 2
+bridge_maxage 12
+
+por esto:
+
+auto tap0
+iface tap0 inet manual
+tunctl_user sinfallas
+
+auto br0
+iface br0 inet manual
+bridge_ports eth0 tap0
+bridge_maxwait 0
+bridge_maxage 12
+
+---------------------------
+
+en sysctl
+net.ipv4.tcp_moderate_rcvbuf = 1
+
+
+en modulos
+ifconfig wlan0 mtu 1492
+ifconfig eth0 mtu 1492
+ifconfig br0 mtu 1492
+ifconfig tap0 mtu 1492
+
+-------------------------
+
+probar la opcion -kernel en el script de arranque (hay que modificar la secuencia de inicio dentro de la vm por eso no se implemento)
+
+-------------------------
+
+agregar modprobe virtio_balloon al arranque de las vm
+
+---------------------------------------
+
+hay que eliminar la verificacion de pid >>> configurar watchdog para revisar pid e interfaces de red (al configurar interfaces se reinicia sin fin)
+
+-------------------------------------
+
+asegurar con apparmor, se confinaron los .pid a /run/viser/
+
+------------------------------
+
+implementacion de variables
+
+----------------------------
+
+se creo un archivo donde habra informacion sobre las VM como IP, claves, y otras caraceristicas
+
+-----------------------------
+
+crear archivo de variables
+
+----------------------------
+
+crear archivos del NAS
+
+---------------------------
+
+se hizo el script de inicio, pausa, reanudar y matar de las VM asi como tambien chequeo de status
+
+-------------------------
+
+debe crearse un tercer switch virtual, a este switch se conectaran todos los equipos menos el firewall y el honeypot, la funcion de ese switch es la trasportar los ping (watchdog) y los comandos de gestion sin necesidad de congestionar la red principal (innecesario)
+
+--------------------------
+
+crear el NAS virtual, ya sea on ubuntu server o openNAS (fue sustituido por imagenes de datos via NFS)
+
+---------------------------
+
+la comunicacion entre la maquina de gestion y las demas se realizara mediante certificados publicos y la creacion de alias de DNS (listo)
