@@ -1,4 +1,16 @@
-commit 54cc70ce3c22a0ae7dca8af08a9867b209e8c840 (HEAD, origin/master, origin/HEAD, master)
+commit cb139b120364901e54c29cc682000a3f1cbe05ec (HEAD, origin/master, origin/HEAD, master)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Fri Dec 11 20:54:57 2015 -0430
+
+    * se agrega prosody
+
+commit 3d21370ceca3d20bc08ab8784f82a24b1fb41402
+Author: jose perez <sinfallas@gmail.com>
+Date:   Thu Dec 10 22:19:28 2015 -0430
+
+    * changelog
+
+commit 54cc70ce3c22a0ae7dca8af08a9867b209e8c840
 Author: jose perez <sinfallas@gmail.com>
 Date:   Thu Dec 10 21:18:47 2015 -0430
 
