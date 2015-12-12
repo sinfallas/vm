@@ -1,0 +1,191 @@
+Abrir en la maquina Firewall los puertos 5222,5223,5269
+
+- iptables -A INPUT -i lo -j ACCEPT
+- iptables -A INPUT -i eth1 -s 192.168.1.0/24 -p tcp -m tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
+- iptables -A INPUT -i eth1 -s 192.168.1.0/24 -p tcp -m tcp -m multiport --dports 5222,5223,5269 -m state --state NEW -j ACCEPT
+
+Para instalar
+
+openssl openssh prosody libsasl2-modules-ldap sasl2-bin liblua5.1-sec1 liblua5.1-cyrussasl0 liblua5.1-socket2 liblua5.1-md5-0 liblua5.1-event0
+
+Una vez instalado modificamos /etc/prosody/prosody.cfg.lua:
+
+- nano /etc/prosody/prosody.cfg.lua
+
+ports = { 5222, 5269 }
+
+ssl_ports = { 5223 }
+
+admins = { "sinfallas@TUDOMINIO", "xombra@TUDOMINIO" }
+
+use_libevent = true; -- la opción predeterminada se basa en la función
+select(), en cambio libevent utiliza epoll(), que es más eficiente y
+escalable.
+
+modules_enabled = {
+"roster";
+"saslauth";
+"tls";
+"dialback";
+"disco";
+"private";
+"vcard";
+"privacy";
+"compression";
+"legacyauth";
+"version";
+"uptime";
+"time";
+"ping";
+"pep";
+"register"; -- no deshabilitar este módulo, permite no solo registrar
+sino también cambiar contraseñas
+"adhoc";
+"admin_adhoc";
+"posix";
+"bosh"; -- agregar esta línea si se desea habilitar jabber sobre http
+};
+
+allow_registration = false; -- deshabilitado por seguridad
+-- cambiar a true si se desea habilitar la creación de cuentas desde el
+propio cliente
+
+ssl = {
+key = "/etc/prosody/certs/localhost.key";
+certificate = "/etc/prosody/certs/localhost.cert";
+}
+
+storage = "internal"; -- el almacenamiento predeterminado es un archivo xml
+-- opcionalmente podemos utilizar el método de almacenamiento "sql"
+-- esto permite utilizar SQLite, MySQL o PostgreSQL como backend (aunque
+deben agregarse ciertos parámetros)
+
+authentication = "internal_hashed"; -- podemos utilizar "internal_plain"
+si el cliente no soporta SCRAM-SHA-1
+-- si deseamos usar el método sasl para posteriormente emplear LDAP,
+debemos utilizar "cyrus"
+
+log = {
+error = "/var/log/prosody/prosody.err";
+info = "/var/log/prosody/prosody.log";
+}
+
+pidfile = "/var/run/prosody/prosody.pid";
+
+VirtualHost "localhost"
+
+VirtualHost "TUDOMINIO"
+
+ssl = {
+key = "/etc/prosody/certs/TUDOMINIO.key";
+certificate = "/etc/prosody/certs/TUDOMINIO.crt";
+}
+
+-- Enable the cyrus backend
+
+c2s_require_encryption = true
+anonymous_login = false
+allow_unencrypted_plain_auth = false
+authentication = "cyrus"
+cyrus_service_name = "xmpp" -- Optional, defaults to "xmpp"
+cyrus_application_name = "xmpp"
+
+Guardamos
+
+Como TUDOMINIO puede ser tu domunio o la IP
+
+Ahora...
+
+SASL:
+
+Editamos /etc/default/saslauthd y colocamos
+
+- nano /etc/default/saslauthd
+
+START=yes
+MECHANISMS="ldap"
+
+ldap_servers: ldap://127.0.0.1
+ldap_search_base: ou=users,dc=tudominio,dc=extension
+
+Guardamos
+
+Cambie tudominio por su dominio sin la extensión, y extension por la
+extensión de su dominio
+
+Creamos o editamos el archivo /etc/sasl/xmpp.conf:
+
+.nano /etc/sasl/xmpp.conf
+
+pwcheck_method: saslauthd
+mech_list: plain login
+
+Guardamos
+
+Creamos el archivo /etc/saslauthd.conf:
+
+- nano /etc/saslauthd.conf
+
+ldap_servers: ldap://127.0.0.1
+ldap_search_base: ou=users,dc=example,dc=com
+
+Guardamos
+
+Cambie example por su dominio sin la extensión, y com por la extensión
+de su dominio
+
+Crearemos los usuarios (en el archivo puede observar que esta
+deshabilitado el registro)
+
+- prosodyctl adduser sinfallas@TUDOMINIO
+- prosodyctl adduser xombra@TUDOMINIO
+
+Ahora generamos certificados autofirmados para nuestro propio dominio:
+
+- cd /etc/prosody/certs
+
+- openssl genrsa -out TUDOMINIO.key 1024
+- openssl req -new -x509 -days 1095 -nodes -out "TUDOMINIO.cert" -keyout
+"TUDOMINIO.key"
+- openssl x509 -fingerprint -md5 -in /etc/prosody/certs/TUDOMINIO.cert
+- openssl x509 -fingerprint -sha1 -in /etc/prosody/certs/TUDOMINIO.cert
+
+Creamos un enlace simbolico a: /etc/prosody/conf.d/ :
+
+ln -sf /etc/prosody/conf.avail/TUDOMINIO.cfg.lua
+/etc/prosody/conf.d/TUDOMINIO.cfg.lua
+
+Editamos o creamos:/usr/lib/sasl2/xmpp.conf
+
+- nano /usr/lib/sasl2/xmpp.conf
+
+Añadir o cambiar
+
+pwcheck_method: saslauthd
+mech_list: PLAIN
+
+restauramos el servicio
+
+service prosody restart
+
+Configuración del cliente
+
+Para ello usaremos Pidgin (http://www.pidgin.im/):
+
+Una vez instalado según la plataforma (Linux - Windows - Mac OS) pasamos
+a configurar la conexión a nuestro servidor Jabber
+
+Ir a Pestaña “Básica”
+
+Nombre de usuario: sinfallas
+Dominio: TUDOMINIOI
+Recurso: pc-sinfallas
+
+Luego ir Pestaña “Avanzadas”
+
+Seguridad de la conexión: Utilizar cifrado si es posible
+
+Puerto de conexión: 5222
+Conectar con el Servidor: TUSERVIDORSEGURO.TUDOMINIO
+
+Conectar y Listo! Maquina Jabber lista.
