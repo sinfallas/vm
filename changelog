@@ -1,4 +1,10 @@
-commit ee5d5ba7e743d3c7055d80ff7a745a305df5e52f (HEAD, origin/master, origin/HEAD, master)
+commit d3746e38558d2f4221fb83ee280599a27174f817 (HEAD -> master, tag: v0.2.2, origin/master, origin/HEAD)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Mon Feb 29 21:40:48 2016 -0430
+
+    * changelog
+
+commit ee5d5ba7e743d3c7055d80ff7a745a305df5e52f
 Author: jose perez <sinfallas@gmail.com>
 Date:   Mon Feb 29 21:40:17 2016 -0430
 
