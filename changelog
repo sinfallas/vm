@@ -1,4 +1,16 @@
-commit d3746e38558d2f4221fb83ee280599a27174f817 (HEAD -> master, tag: v0.2.2, origin/master, origin/HEAD)
+commit 1721c90de80d2488e1ab07365b9bb28e97421702 (HEAD -> master, origin/master, origin/HEAD)
+Author: jose perez <sinfallas@gmail.com>
+Date:   Sun Jul 21 12:58:01 2019 -0400
+
+    * script para apache
+
+commit 25e38b65cf97ca3d6675ce57e33efe506e20da7c
+Author: jose perez <sinfallas@gmail.com>
+Date:   Sun Sep 30 13:27:33 2018 -0400
+
+    * changelog
+
+commit d3746e38558d2f4221fb83ee280599a27174f817 (tag: v0.2.2)
 Author: jose perez <sinfallas@gmail.com>
 Date:   Mon Feb 29 21:40:48 2016 -0430
 
